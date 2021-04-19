@@ -1,39 +1,46 @@
 # History files
-.Rhistory
-.Rapp.history
-
+\.Rhistory
+\.Rapp\.history
 # Session Data files
-.RData
-
-# User-specific files
-.Ruserdata
-
+\.RData
+# User Data files
+\.Ruserdata
 # Example code in package build process
-*-Ex.R
-
-# Output files from R CMD build
-/*.tar.gz
-
-# Output files from R CMD check
-/*.Rcheck/
-
+*-Ex\.R
 # RStudio files
-.Rproj.user/
-
+\.Rproj\.user
 # produced vignettes
-vignettes/*.html
-vignettes/*.pdf
-
+vignettes/*\.html
+vignettes/*\.pdf
+# internal files (e.g. scratch files)
+internal
 # OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
-.httr-oauth
-
-# knitr and R markdown default cache directories
-*_cache/
-/cache/
-
-# Temporary files created by R markdown
-*.utf8.md
-*.knit.md
-
-# R Environment Variables
-.Renviron
+\.httr-oauth
+# Spark binaries temp directory
+spark
+# Hive metadata
+metastore_db/
+derby\.log
+# README.md cache
+README_cache
+# Perf.md cache
+perf_cache
+spark-warehouse
+# Ignore everything under docs except for docs/reference
+docs/*
+!docs/reference
+\.DS_Store
+demo\.R
+# Spark log
+log4j\.spark*
+/configure
+/bin/
+\.cache-main
+\.settings
+\.classpath
+# H2O Files
+h2ologs/*
+**/h2ologs/*
+# IDE stuff
+\.project
+.Rproj.user
