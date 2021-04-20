@@ -1,0 +1,37 @@
+testthat_spark_connection <- function(conn_attempts, conn_retry_interval_s = 2) {
+  conn_key <- ".testthat_spark_connection"
+  if (!exists(conn_key, envir = .GlobalEnv)) {
+    version <- Sys.getenv("SPARK_VERSION")
+    spark_installed <- spark_installed_versions()
+    if (nrow(spark_installed[spark_installed$spark == version, ]) == 0) {
+      spark_install(version)
+    }
+
+    conn_attempts <- 3
+    for (attempt in seq(conn_attempts)) {
+      success <- tryCatch(
+        {
+          sc <- spark_connect(
+            master = "local",
+            method = "shell",
+            app_name = paste0("testthat-", uuid::UUIDgenerate()),
+            version = version
+          )
+          assign(conn_key, sc, envir = .GlobalEnv)
+          TRUE
+        },
+        error = function(e) {
+          if (attempt < conn_attempts) {
+            Sys.sleep(conn_retry_interval_s)
+            FALSE
+          } else {
+            e
+          }
+        }
+      )
+      if (success) break
+    }
+  }
+
+  get(conn_key, envir = .GlobalEnv)
+}
