@@ -25,7 +25,10 @@ spark_dependencies <- function(spark_version, scala_version, ...) {
     ),
     initializer = function(sc) {
       invoke_static(
-        sc, "org.apache.sedona.sql.UDT.UdtRegistrator", "registerAll"
+        sc,
+        "org.apache.sedona.sql.utils.SedonaSQLRegistrator",
+        "registerAll",
+        spark_session(sc)
       )
     }
   )
