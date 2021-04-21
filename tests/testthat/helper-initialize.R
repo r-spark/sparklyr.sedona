@@ -35,3 +35,7 @@ testthat_spark_connection <- function(conn_attempts, conn_retry_interval_s = 2) 
 
   get(conn_key, envir = .GlobalEnv)
 }
+
+test_data <- function(file_name) {
+  file.path(normalizePath(getwd()), "data", file_name)
+}

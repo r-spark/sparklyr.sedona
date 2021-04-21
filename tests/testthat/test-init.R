@@ -1,4 +1,4 @@
-context("runtime config")
+context("initialization")
 
 sc <- testthat_spark_connection()
 
@@ -30,4 +30,29 @@ test_that("Sedona UDTs are registered correctly", {
       )
     )
   }
+})
+
+test_that("Sedona Spark SQL functions are registered correctly", {
+  sdf <- spark_read_tsv(
+    sc,
+    path = test_data("county_small.tsv"),
+    columns = c("county_shape", paste0("_c", seq(17)))
+  )
+  spatial_sdf <- sdf %>%
+    dplyr::mutate(county_shape = ST_GeomFromWKT(county_shape)) %>%
+    dplyr::mutate(
+      pt = dplyr::sql(
+        "ST_Point(CAST(40 AS DECIMAL(24, 20)), CAST(-40 AS DECIMAL(24, 20)))"
+      )
+    )
+  schema <- spatial_sdf %>% sdf_schema()
+
+  expect_equal(
+    schema[[1]],
+    list(name = "county_shape", type = "GeometryUDT")
+  )
+  expect_equal(
+    schema[[19]],
+    list(name = "pt", type = "GeometryUDT")
+  )
 })
