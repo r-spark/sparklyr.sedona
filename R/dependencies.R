@@ -30,6 +30,47 @@ spark_dependencies <- function(spark_version, scala_version, ...) {
         "registerAll",
         spark_session(sc)
       )
+
+      for (x in c(
+                  "CSV",
+                  "TSV",
+                  "GEOJSON",
+                  "WKT",
+                  "WKB",
+                  "COMMA",
+                  "TAB",
+                  "QUESTIONMARK",
+                  "SINGLEQUOTE",
+                  "QUOTE",
+                  "UNDERSCORE",
+                  "DASH",
+                  "PERCENT",
+                  "TILDE",
+                  "PIPE",
+                  "SEMICOLON")) {
+        sc$state$enums$delimiter[[x]] <- invoke_static(
+          sc, "org.apache.sedona.core.enums.FileDataSplitter", x
+        )
+      }
+      for (x in c(
+                  "POINT",
+                  "POLYGON",
+                  "LINESTRING",
+                  "MULTIPOINT",
+                  "MULTIPOLYGON",
+                  "MULTILINESTRING",
+                  "GEOMETRYCOLLECTION",
+                  "CIRCLE",
+                  "RECTANGLE")) {
+        sc$state$enums$geometry_type[[x]] <- invoke_static(
+          sc, "org.apache.sedona.core.enums.GeometryType", x
+        )
+      }
+      sc$state$enums$storage_level$memory_and_disk <- invoke_static(
+        sc, "org.apache.spark.storage.StorageLevel", "MEMORY_AND_DISK"
+      )
+
+      lockBinding(sym = "enums", env = sc$state)
     }
   )
 }
