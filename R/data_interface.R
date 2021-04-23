@@ -110,7 +110,7 @@ sedona_read_dsv <- function(
     invoke(rdd, "analyze", sc$state$enums$storage_level$memory_and_disk)
   }
 
-  rdd
+  make_spatial_rdd(type, rdd)
 }
 
 to_delimiter_enum_value <- function(sc, delimiter) {

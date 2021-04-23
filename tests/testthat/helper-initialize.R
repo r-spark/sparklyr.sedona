@@ -39,3 +39,15 @@ testthat_spark_connection <- function(conn_attempts, conn_retry_interval_s = 2) 
 test_data <- function(file_name) {
   file.path(normalizePath(getwd()), "data", file_name)
 }
+
+expect_boundary_envelope <- function(rdd, expected) {
+  actual <- lapply(
+    paste0("get", c("MinX", "MaxX", "MinY", "MaxY")),
+    function(getter) {
+      rdd$.jobj %>% invoke("%>%", list("boundaryEnvelope"), list(getter))
+    }
+  ) %>%
+    unlist()
+
+  expect_equal(actual, expected)
+}
