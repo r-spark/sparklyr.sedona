@@ -20,7 +20,7 @@ spark_dependencies <- function(spark_version, scala_version, ...) {
         "org.datasyslab:geotools-wrapper:geotools-24.0",
         "org.datasyslab:sernetcdf:0.1.0",
         "org.locationtech.jts:jts-core:1.18.0",
-        "org.wololo:jts2geojson:0.14.0"
+        "org.wololo:jts2geojson:0.14.3"
       )
     ),
     initializer = function(sc) {
@@ -66,8 +66,8 @@ spark_dependencies <- function(spark_version, scala_version, ...) {
           sc, "org.apache.sedona.core.enums.GeometryType", x
         )
       }
-      sc$state$enums$storage_level$memory_and_disk <- invoke_static(
-        sc, "org.apache.spark.storage.StorageLevel", "MEMORY_AND_DISK"
+      sc$state$object_cache$storage_levels$memory_only <- invoke_static(
+        sc, "org.apache.spark.storage.StorageLevel", "MEMORY_ONLY"
       )
 
       lockBinding(sym = "enums", env = sc$state)
