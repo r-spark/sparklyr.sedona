@@ -33,10 +33,11 @@ test_that("Sedona UDTs are registered correctly", {
 })
 
 test_that("Sedona Spark SQL functions are registered correctly", {
-  sdf <- spark_read_tsv(
+  sdf <- spark_read_csv(
     sc,
     path = test_data("county_small.tsv"),
-    columns = c("county_shape", paste0("_c", seq(17)))
+    columns = c("county_shape", paste0("_c", seq(17))),
+    delimiter = "\t"
   )
   spatial_sdf <- sdf %>%
     dplyr::mutate(county_shape = ST_GeomFromWKT(county_shape)) %>%
