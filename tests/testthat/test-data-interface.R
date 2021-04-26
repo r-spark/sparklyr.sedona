@@ -165,13 +165,10 @@ test_that("sedona_read_geojson() can skip invalid geometries correctly", {
   )
 })
 
-test_that("sedona_read_geojson() can read feature with ID correctly", {
-  geojson_rdd <- sedona_read_geojson(sc, test_data("feature-with-id.json"))
+test_that("sedona_read_wkb() works as expected", {
+  wkb_rdd <- sedona_read_wkb(sc, test_data("county_small_wkb.tsv"))
 
   expect_equal(
-    geojson_rdd$.jobj %>% invoke("%>%", list("rawSpatialRDD"), list("count")), 1
-  )
-  expect_equal(
-    geojson_rdd$.jobj %>% invoke("%>%", list("fieldNames"), list("size")), 3
+    wkb_rdd$.jobj %>% invoke("%>%", list("rawSpatialRDD"), list("count")), 103
   )
 })

@@ -31,5 +31,5 @@ errorings.}
 RDD (default: 1).}
 }
 \description{
-Create a SpatialRDD from a GeoJSON data source.
+Create a generic SpatialRDD from a GeoJSON data source.
 }

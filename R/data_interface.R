@@ -141,7 +141,7 @@ sedona_read_typed_geojson <- function(
 
 #' Create a SpatialRDD from a GeoJSON data source.
 #'
-#' Create a SpatialRDD from a GeoJSON data source.
+#' Create a generic SpatialRDD from a GeoJSON data source.
 #'
 #' @inheritParams sedona_typed_spatial_rdd_data_source
 #' @param allow_invalid_geometries Whether to allow topology-invalid
@@ -169,6 +169,48 @@ sedona_read_geojson <- function(
     "org.apache.sedona.core.formatMapper.GeoJsonReader",
     "readToGeometryRDD",
     raw_text_rdd,
+    allow_invalid_geometries,
+    skip_syntactically_invalid_geometries
+  ) %>%
+    set_storage_level(storage_level) %>%
+    make_spatial_rdd(NULL)
+}
+
+#' Create a SpatialRDD from a Well-Known Binary (WKB) data source.
+#'
+#' Create a generic SpatialRDD from a hex-encoded Well-Known Binary (WKB) data
+#' source.
+#'
+#' @inheritParams sedona_typed_spatial_rdd_data_source
+#' @param wkb_col Zero-based index of column containing hex-encoded WKB data
+#'   (default: 0).
+#' @param allow_invalid_geometries Whether to allow topology-invalid
+#'   geometries to exist in the resulting RDD.
+#' @param skip_syntactically_invalid_geometries Whether to allows Sedona to
+#'   automatically skip syntax-invalid geometries, rather than throwing
+#'   errorings.
+#'
+#' @export
+sedona_read_wkb <- function(
+                            sc,
+                            location,
+                            wkb_col = 0L,
+                            allow_invalid_geometries = TRUE,
+                            skip_syntactically_invalid_geometries = TRUE,
+                            storage_level = "MEMORY_ONLY",
+                            repartition = 1L) {
+  raw_text_rdd <- invoke(
+    java_context(sc),
+    "textFile",
+    location,
+    min(as.integer(repartition %||% 1L), 1L)
+  )
+  invoke_static(
+    sc,
+    "org.apache.sedona.core.formatMapper.WkbReader",
+    "readToGeometryRDD",
+    raw_text_rdd,
+    as.integer(wkb_col),
     allow_invalid_geometries,
     skip_syntactically_invalid_geometries
   ) %>%
