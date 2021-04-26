@@ -2,8 +2,8 @@ context("data interface")
 
 sc <- testthat_spark_connection()
 
-test_that("sedona_read_dsv() creates PointRDD correctly", {
-  pt_rdd <- sedona_read_dsv(
+test_that("sedona_read_typed_dsv() creates PointRDD correctly", {
+  pt_rdd <- sedona_read_typed_dsv(
     sc,
     location = test_data("arealm-small.csv"),
     delimiter = ",",
@@ -30,8 +30,8 @@ test_that("sedona_read_dsv() creates PointRDD correctly", {
   }
 })
 
-test_that("sedona_read_dsv() creates PolygonRDD correctly", {
-  polygon_rdd <- sedona_read_dsv(
+test_that("sedona_read_typed_dsv() creates PolygonRDD correctly", {
+  polygon_rdd <- sedona_read_typed_dsv(
     sc,
     location = test_data("primaryroads-polygon.csv"),
     delimiter = ",",
@@ -45,8 +45,8 @@ test_that("sedona_read_dsv() creates PolygonRDD correctly", {
   expect_boundary_envelope(polygon_rdd, c(-158.104182, -66.03575, 17.986328, 48.645133))
 })
 
-test_that("sedona_read_dsv() creates LineStringRDD correctly", {
-  linestring_rdd <- sedona_read_dsv(
+test_that("sedona_read_typed_dsv() creates LineStringRDD correctly", {
+  linestring_rdd <- sedona_read_typed_dsv(
     sc,
     location = test_data("primaryroads-linestring.csv"),
     delimiter = ",",
@@ -60,8 +60,8 @@ test_that("sedona_read_dsv() creates LineStringRDD correctly", {
   expect_boundary_envelope(linestring_rdd, c(-123.393766, -65.648659, 17.982169, 49.002374))
 })
 
-test_that("sedona_read_geojson() creates PointRDD correctly", {
-  pt_rdd <- sedona_read_geojson(
+test_that("sedona_read_typed_geojson() creates PointRDD correctly", {
+  pt_rdd <- sedona_read_typed_geojson(
     sc,
     location = test_data("arealm-small.json"),
     type = "point",
@@ -86,8 +86,8 @@ test_that("sedona_read_geojson() creates PointRDD correctly", {
   }
 })
 
-test_that("sedona_read_geojson() creates PolygonRDD correctly", {
-  polygon_rdd <- sedona_read_geojson(
+test_that("sedona_read_typed_geojson() creates PolygonRDD correctly", {
+  polygon_rdd <- sedona_read_typed_geojson(
     sc,
     location = test_data("polygon.json"),
     type = "polygon",
@@ -114,5 +114,64 @@ test_that("sedona_read_geojson() creates PolygonRDD correctly", {
       invoke("%>%", list("fieldNames"), list("toArray")) %>%
       unlist(),
     c("STATEFP", "COUNTYFP", "TRACTCE", "BLKGRPCE", "AFFGEOID", "GEOID", "NAME", "LSAD", "ALAND", "AWATER")
+  )
+})
+
+test_that("sedona_read_geojson() works as expected on geojson input with 'type' and 'geometry' properties", {
+  geojson_rdd <- sedona_read_geojson(sc, test_data("polygon.json"))
+
+  expect_equal(
+    geojson_rdd$.jobj %>% invoke("%>%", list("rawSpatialRDD"), list("count")), 1001
+  )
+})
+
+test_that("sedona_read_geojson() works as expected on geojson input without 'type' or 'geometry' properties", {
+  geojson_rdd <- sedona_read_geojson(sc, test_data("polygon-without-properties.json"))
+
+  expect_equal(
+    geojson_rdd$.jobj %>% invoke("%>%", list("rawSpatialRDD"), list("count")), 10
+  )
+})
+
+test_that("sedona_read_geojson() works as expected on geojson input with null property value", {
+  geojson_rdd <- sedona_read_geojson(sc, test_data("polygon-with-null-property-value.json"))
+
+  expect_equal(
+    geojson_rdd$.jobj %>% invoke("%>%", list("rawSpatialRDD"), list("count")), 3
+  )
+})
+
+test_that("sedona_read_geojson() can skip invalid geometries correctly", {
+  geojson_rdd <- sedona_read_geojson(
+    sc,
+    test_data("polygon-with-invalid-geometries.json"),
+    allow_invalid_geometries = TRUE,
+    skip_syntactically_invalid_geometries = FALSE
+  )
+
+  expect_equal(
+    geojson_rdd$.jobj %>% invoke("%>%", list("rawSpatialRDD"), list("count")), 3
+  )
+
+  geojson_rdd <- sedona_read_geojson(
+    sc,
+    test_data("polygon-with-invalid-geometries.json"),
+    allow_invalid_geometries = FALSE,
+    skip_syntactically_invalid_geometries = FALSE
+  )
+
+  expect_equal(
+    geojson_rdd$.jobj %>% invoke("%>%", list("rawSpatialRDD"), list("count")), 2
+  )
+})
+
+test_that("sedona_read_geojson() can read feature with ID correctly", {
+  geojson_rdd <- sedona_read_geojson(sc, test_data("feature-with-id.json"))
+
+  expect_equal(
+    geojson_rdd$.jobj %>% invoke("%>%", list("rawSpatialRDD"), list("count")), 1
+  )
+  expect_equal(
+    geojson_rdd$.jobj %>% invoke("%>%", list("fieldNames"), list("size")), 3
   )
 })
