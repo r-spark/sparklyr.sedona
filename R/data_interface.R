@@ -108,6 +108,30 @@ sedona_read_typed_dsv <- function(
     make_spatial_rdd(type)
 }
 
+#' Create a typed SpatialRDD from a shapefile data source.
+#'
+#' Create a typed SpatialRDD (namely, a PointRDD, a PolygonRDD, or a
+#' LineStringRDD) from a shapefile data source.
+#'
+#' @inheritParams sedona_typed_spatial_rdd_data_source
+#'
+#' @export
+sedona_read_typed_shapefile <- function(
+                                        sc,
+                                        location,
+                                        type = c("point", "polygon", "linestring"),
+                                        storage_level = "MEMORY_ONLY") {
+  invoke_static(
+    sc,
+    "org.apache.sedona.core.formatMapper.shapefileParser.ShapefileReader",
+    paste0("readTo", to_camel_case(type), "RDD"),
+    java_context(sc),
+    location
+  ) %>%
+    set_storage_level(storage_level) %>%
+    make_spatial_rdd(type)
+}
+
 #' Create a typed SpatialRDD from a GeoJSON data source.
 #'
 #' Create a typed SpatialRDD (namely, a PointRDD, a PolygonRDD, or a
@@ -223,13 +247,17 @@ rdd_cls_from_type <- function(type = c("point", "polygon", "linestring")) {
 
   paste0(
     "org.apache.sedona.core.spatialRDD.",
-    switch(
-      type,
-      point = "Point",
-      polygon = "Polygon",
-      linestring = "LineString"
-    ),
+    to_camel_case(type),
     "RDD"
+  )
+}
+
+to_camel_case <- function(type) {
+  switch(
+    type,
+    point = "Point",
+    polygon = "Polygon",
+    linestring = "LineString"
   )
 }
 

@@ -172,3 +172,45 @@ test_that("sedona_read_wkb() works as expected", {
     wkb_rdd$.jobj %>% invoke("%>%", list("rawSpatialRDD"), list("count")), 103
   )
 })
+
+test_that("sedona_read_typed_shapefile() creates PointRDD correctly", {
+  pt_rdd <- sedona_read_typed_shapefile(
+    sc,
+    location = test_data("point"),
+    type = "point"
+  )
+
+  expect_equal(class(pt_rdd), c("point_rdd", "spatial_rdd"))
+  expect_equal(
+    pt_rdd$.jobj %>% invoke("%>%", list("rawSpatialRDD"), list("count")),
+    100000
+  )
+})
+
+test_that("sedona_read_typed_shapefile() creates PolygonRDD correctly", {
+  polygon_rdd <- sedona_read_typed_shapefile(
+    sc,
+    location = test_data("polygon"),
+    type = "polygon"
+  )
+
+  expect_equal(class(polygon_rdd), c("polygon_rdd", "spatial_rdd"))
+  expect_equal(
+    polygon_rdd$.jobj %>% invoke("%>%", list("rawSpatialRDD"), list("count")),
+    20069
+  )
+})
+
+test_that("sedona_read_typed_shapefile() creates LineStringRDD correctly", {
+  linestring_rdd <- sedona_read_typed_shapefile(
+    sc,
+    location = test_data("polyline"),
+    type = "linestring"
+  )
+
+  expect_equal(class(linestring_rdd), c("linestring_rdd", "spatial_rdd"))
+  expect_equal(
+    linestring_rdd$.jobj %>% invoke("%>%", list("rawSpatialRDD"), list("count")),
+    15137
+  )
+})
