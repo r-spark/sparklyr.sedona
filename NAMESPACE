@@ -3,6 +3,7 @@
 export(sedona_read_geojson)
 export(sedona_read_typed_dsv)
 export(sedona_read_typed_geojson)
+export(sedona_read_typed_shapefile)
 export(sedona_read_wkb)
 import(sparklyr)
 importFrom(rlang,"%||%")
