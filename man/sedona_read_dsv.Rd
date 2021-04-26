@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_interface.R
 \name{sedona_read_dsv}
 \alias{sedona_read_dsv}
-\title{Create a typed SpatialRDD from a delimiter-separated values file.}
+\title{Create a typed SpatialRDD from a delimiter-separated values data source.}
 \usage{
 sedona_read_dsv(
   sc,
@@ -12,14 +12,14 @@ sedona_read_dsv(
   first_spatial_col_index = 0L,
   last_spatial_col_index = NULL,
   contains_non_geom_attributes = TRUE,
-  memory = TRUE,
+  storage_level = "MEMORY_ONLY",
   repartition = 1L
 )
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
 
-\item{location}{Location of the input file.}
+\item{location}{Location of the data source.}
 
 \item{delimiter}{Delimiter within each record. Must be one of
 ',', '\\t', '?', '\\'', '"', '_', '-', '\%', '~', '|', ';'}
@@ -40,15 +40,15 @@ it will assume the value of -1 (i.e., the last of all input columns).}
 \item{contains_non_geom_attributes}{Whether the input contains non-
 geometrical attributes (default: TRUE).}
 
-\item{memory}{Whether to cache the resulting RDD in memory (default: TRUE).}
+\item{storage_level}{Storage level of the RDD (default: MEMORY_ONLY).}
 
 \item{repartition}{The number of partitions to have in the resulting RDD
 (default: 1).}
 }
 \description{
 Create a typed SpatialRDD (namely, a PointRDD, a PolygonRDD, or a
-LineStringRDD) from a delimiter-separated values file.
-The input file can contain spatial attributes (e.g., longitude and latidude)
+LineStringRDD) from a data source containing delimiter-separated values.
+The data source can contain spatial attributes (e.g., longitude and latidude)
 and other attributes. Currently only inputs with spatial attributes occupying
 a contiguous range of columns (i.e.,
 [first_spatial_col_index, last_spatial_col_index]) are supported.

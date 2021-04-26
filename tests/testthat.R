@@ -14,7 +14,7 @@ if (identical(Sys.getenv("NOT_CRAN"), "true")) {
   if (identical(filter, "")) filter <- NULL
 
   reporter <- MultiReporter$new(reporters = list(
-    ProgressReporter$new(),
+    ProgressReporter$new(show_praise = FALSE),
     CheckReporter$new(),
     SummaryReporter$new(show_praise = FALSE)
   ))

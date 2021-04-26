@@ -59,3 +59,60 @@ test_that("sedona_read_dsv() creates LineStringRDD correctly", {
   expect_equal(linestring_rdd$.jobj %>% invoke("approximateTotalCount"), 3000)
   expect_boundary_envelope(linestring_rdd, c(-123.393766, -65.648659, 17.982169, 49.002374))
 })
+
+test_that("sedona_read_geojson() creates PointRDD correctly", {
+  pt_rdd <- sedona_read_geojson(
+    sc,
+    location = test_data("arealm-small.json"),
+    type = "point",
+    contains_non_geom_attributes = TRUE
+  )
+
+  expect_equal(class(pt_rdd), c("point_rdd", "spatial_rdd"))
+  expect_equal(pt_rdd$.jobj %>% invoke("approximateTotalCount"), 3000)
+  expect_boundary_envelope(pt_rdd, c(-173.1208, -84.9660, 30.2449, 71.3551))
+  for (idx in 0:8) {
+    expect_equal(
+      pt_rdd$.jobj %>%
+        invoke(
+          "%>%",
+          list("rawSpatialRDD"),
+          list("take", 9L),
+          list("get", idx),
+          list("getUserData")
+        ),
+      "testattribute0\ttestattribute1\ttestattribute2"
+    )
+  }
+})
+
+test_that("sedona_read_geojson() creates PolygonRDD correctly", {
+  polygon_rdd <- sedona_read_geojson(
+    sc,
+    location = test_data("polygon.json"),
+    type = "polygon",
+    contains_non_geom_attributes = TRUE
+  )
+
+  expect_equal(class(polygon_rdd), c("polygon_rdd", "spatial_rdd"))
+  expect_equal(polygon_rdd$.jobj %>% invoke("approximateTotalCount"), 1001)
+  expect_false(is.null(polygon_rdd$.jobj %>% invoke("boundaryEnvelope")))
+  first_2 <- polygon_rdd$.jobj %>%
+    invoke("%>%", list("rawSpatialRDD"), list("take", 2L))
+  expected_data <- c(
+    "01\t077\t011501\t5\t1500000US010770115015\t010770115015\t5\tBG\t6844991\t32636",
+    "01\t045\t021102\t4\t1500000US010450211024\t010450211024\t4\tBG\t11360854\t0"
+  )
+  for (i in seq_along(expected_data)) {
+    expect_equal(
+      first_2[[i]] %>% invoke("getUserData"),
+      expected_data[[i]]
+    )
+  }
+  expect_equal(
+    polygon_rdd$.jobj %>%
+      invoke("%>%", list("fieldNames"), list("toArray")) %>%
+      unlist(),
+    c("STATEFP", "COUNTYFP", "TRACTCE", "BLKGRPCE", "AFFGEOID", "GEOID", "NAME", "LSAD", "ALAND", "AWATER")
+  )
+})
