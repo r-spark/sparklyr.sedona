@@ -8,10 +8,10 @@
 #' @param contains_non_geom_attributes Whether the input contains non-
 #'   geometrical attributes (default: TRUE).
 #' @param storage_level Storage level of the RDD (default: MEMORY_ONLY).
-#' @param repartition The number of partitions to have in the resulting RDD
-#'   (default: 1).
+#' @param repartition The minimum number of partitions to have in the resulting
+#'   RDD (default: 1).
 #'
-#' @name sedona_spatial_rdd_data_source
+#' @name sedona_typed_spatial_rdd_data_source
 NULL
 
 #' Create a typed SpatialRDD from a delimiter-separated values data source.
@@ -23,7 +23,7 @@ NULL
 #' a contiguous range of columns (i.e.,
 #' [first_spatial_col_index, last_spatial_col_index]) are supported.
 #'
-#' @inheritParams sedona_spatial_rdd_data_source
+#' @inheritParams sedona_typed_spatial_rdd_data_source
 #' @param delimiter Delimiter within each record. Must be one of
 #'   ',', '\\t', '?', '\\'', '"', '_', '-', '\%', '~', '|', ';'
 #' @param first_spatial_col_index Zero-based index of the left-most column
@@ -36,16 +36,16 @@ NULL
 #'   it will assume the value of -1 (i.e., the last of all input columns).
 #'
 #' @export
-sedona_read_dsv <- function(
-                            sc,
-                            location,
-                            delimiter = c(",", "\t", "?", "'", "\"", "_", "-", "%", "~", "|", ";"),
-                            type = c("point", "polygon", "linestring"),
-                            first_spatial_col_index = 0L,
-                            last_spatial_col_index = NULL,
-                            contains_non_geom_attributes = TRUE,
-                            storage_level = "MEMORY_ONLY",
-                            repartition = 1L) {
+sedona_read_typed_dsv <- function(
+                                  sc,
+                                  location,
+                                  delimiter = c(",", "\t", "?", "'", "\"", "_", "-", "%", "~", "|", ";"),
+                                  type = c("point", "polygon", "linestring"),
+                                  first_spatial_col_index = 0L,
+                                  last_spatial_col_index = NULL,
+                                  contains_non_geom_attributes = TRUE,
+                                  storage_level = "MEMORY_ONLY",
+                                  repartition = 1L) {
   delimiter <- to_delimiter_enum_value(sc, match.arg(delimiter))
   rdd_cls <- rdd_cls_from_type(type)
   first_spatial_col_index <- as.integer(first_spatial_col_index)
@@ -113,16 +113,16 @@ sedona_read_dsv <- function(
 #' Create a typed SpatialRDD (namely, a PointRDD, a PolygonRDD, or a
 #' LineStringRDD) from a GeoJSON data source.
 #'
-#' @inheritParams sedona_spatial_rdd_data_source
+#' @inheritParams sedona_typed_spatial_rdd_data_source
 #'
 #' @export
-sedona_read_geojson <- function(
-                                sc,
-                                location,
-                                type = c("point", "polygon", "linestring"),
-                                contains_non_geom_attributes = TRUE,
-                                storage_level = "MEMORY_ONLY",
-                                repartition = 1L) {
+sedona_read_typed_geojson <- function(
+                                      sc,
+                                      location,
+                                      type = c("point", "polygon", "linestring"),
+                                      contains_non_geom_attributes = TRUE,
+                                      storage_level = "MEMORY_ONLY",
+                                      repartition = 1L) {
   rdd_cls <- rdd_cls_from_type(type)
   delimiter <- sc$state$enums$delimiter$GEOJSON
 
@@ -137,6 +137,43 @@ sedona_read_geojson <- function(
   ) %>%
     set_storage_level(storage_level) %>%
     make_spatial_rdd(type)
+}
+
+#' Create a SpatialRDD from a GeoJSON data source.
+#'
+#' Create a SpatialRDD from a GeoJSON data source.
+#'
+#' @inheritParams sedona_typed_spatial_rdd_data_source
+#' @param allow_invalid_geometries Whether to allow topology-invalid
+#'   geometries to exist in the resulting RDD.
+#' @param skip_syntactically_invalid_geometries Whether to allows Sedona to
+#'   automatically skip syntax-invalid geometries, rather than throwing
+#'   errorings.
+#'
+#' @export
+sedona_read_geojson <- function(
+                                sc,
+                                location,
+                                allow_invalid_geometries = TRUE,
+                                skip_syntactically_invalid_geometries = TRUE,
+                                storage_level = "MEMORY_ONLY",
+                                repartition = 1L) {
+  raw_text_rdd <- invoke(
+    java_context(sc),
+    "textFile",
+    location,
+    min(as.integer(repartition %||% 1L), 1L)
+  )
+  invoke_static(
+    sc,
+    "org.apache.sedona.core.formatMapper.GeoJsonReader",
+    "readToGeometryRDD",
+    raw_text_rdd,
+    allow_invalid_geometries,
+    skip_syntactically_invalid_geometries
+  ) %>%
+    set_storage_level(storage_level) %>%
+    make_spatial_rdd(NULL)
 }
 
 rdd_cls_from_type <- function(type = c("point", "polygon", "linestring")) {

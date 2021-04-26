@@ -2,13 +2,13 @@
 % Please edit documentation in R/data_interface.R
 \name{sedona_read_geojson}
 \alias{sedona_read_geojson}
-\title{Create a typed SpatialRDD from a GeoJSON data source.}
+\title{Create a SpatialRDD from a GeoJSON data source.}
 \usage{
 sedona_read_geojson(
   sc,
   location,
-  type = c("point", "polygon", "linestring"),
-  contains_non_geom_attributes = TRUE,
+  allow_invalid_geometries = TRUE,
+  skip_syntactically_invalid_geometries = TRUE,
   storage_level = "MEMORY_ONLY",
   repartition = 1L
 )
@@ -18,18 +18,18 @@ sedona_read_geojson(
 
 \item{location}{Location of the data source.}
 
-\item{type}{Type of the SpatialRDD (must be one of "point", "polygon", or
-"linestring".}
+\item{allow_invalid_geometries}{Whether to allow topology-invalid
+geometries to exist in the resulting RDD.}
 
-\item{contains_non_geom_attributes}{Whether the input contains non-
-geometrical attributes (default: TRUE).}
+\item{skip_syntactically_invalid_geometries}{Whether to allows Sedona to
+automatically skip syntax-invalid geometries, rather than throwing
+errorings.}
 
 \item{storage_level}{Storage level of the RDD (default: MEMORY_ONLY).}
 
-\item{repartition}{The number of partitions to have in the resulting RDD
-(default: 1).}
+\item{repartition}{The minimum number of partitions to have in the resulting
+RDD (default: 1).}
 }
 \description{
-Create a typed SpatialRDD (namely, a PointRDD, a PolygonRDD, or a
-LineStringRDD) from a GeoJSON data source.
+Create a SpatialRDD from a GeoJSON data source.
 }
