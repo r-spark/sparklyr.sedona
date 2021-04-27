@@ -33,3 +33,12 @@ RDD (default: 1).}
 \description{
 Create a generic SpatialRDD from a GeoJSON data source.
 }
+\seealso{
+Other Sedona data inferface functions: 
+\code{\link{sedona_read_dsv_to_typed_rdd}()},
+\code{\link{sedona_read_geojson_to_typed_rdd}()},
+\code{\link{sedona_read_shapefile_to_typed_rdd}()},
+\code{\link{sedona_read_shapefile}()},
+\code{\link{sedona_read_wkb}()}
+}
+\concept{Sedona data inferface functions}
