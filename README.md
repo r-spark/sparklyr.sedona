@@ -1,2 +1,4 @@
 # sparklyr.sedona
- This sparklyr extension is an R interface for Apache Sedona  (&lt;https://sedona.apache.org>).
+ This [sparklyr](https://github.com/sparklyr/sparklyr) extension is an R interface for Apache Sedona (&lt;https://sedona.apache.org>). It aims to combine the power of highly efficient and scalable in-memory distributed data processing by Apache Spark with the versatile set of out-of-the-box Spatial Resilient Distributed Datasets and SpatialSQL functionalities that Apache Sedona has to offer. Because this extension is built on top of `sparklyr`, users will be able to build spatial Spark SQL queries using Sedona SpatialSQL functions in conjunction with a wide range of dplyr expressions, and also benefit from other idiomatic R constructs and frameworks provided by `sparklyr`.
+
+`sparklyr.sedona` is under active development at the moment. Your suggestions, PRs, and bug reports will be highly appreciated!
