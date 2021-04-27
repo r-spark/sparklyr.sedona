@@ -10,6 +10,13 @@ sedona_read_shapefile_to_typed_rdd(
   type = c("point", "polygon", "linestring"),
   storage_level = "MEMORY_ONLY"
 )
+
+sedona_read_shapefile_to_typed_rdd(
+  sc,
+  location,
+  type = c("point", "polygon", "linestring"),
+  storage_level = "MEMORY_ONLY"
+)
 }
 \arguments{
 \item{sc}{A \code{spark_connection}.}
@@ -24,6 +31,9 @@ sedona_read_shapefile_to_typed_rdd(
 \description{
 Create a typed SpatialRDD (namely, a PointRDD, a PolygonRDD, or a
 LineStringRDD) from a shapefile data source.
+
+Create a typed SpatialRDD (namely, a PointRDD, a PolygonRDD, or a
+LineStringRDD) from a shapefile data source.
 }
 \seealso{
 Other Sedona data inferface functions: 
@@ -31,6 +41,9 @@ Other Sedona data inferface functions:
 \code{\link{sedona_read_geojson_to_typed_rdd}()},
 \code{\link{sedona_read_geojson}()},
 \code{\link{sedona_read_shapefile}()},
-\code{\link{sedona_read_wkb}()}
+\code{\link{sedona_read_wkb}()},
+\code{\link{sedona_write_geojson}()},
+\code{\link{sedona_write_wkb}()},
+\code{\link{sedona_write_wkt}()}
 }
 \concept{Sedona data inferface functions}

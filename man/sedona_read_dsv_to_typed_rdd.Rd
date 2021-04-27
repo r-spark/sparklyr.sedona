@@ -11,7 +11,7 @@ sedona_read_dsv_to_typed_rdd(
   type = c("point", "polygon", "linestring"),
   first_spatial_col_index = 0L,
   last_spatial_col_index = NULL,
-  contains_non_geom_attributes = TRUE,
+  has_non_spatial_attrs = TRUE,
   storage_level = "MEMORY_ONLY",
   repartition = 1L
 )
@@ -37,8 +37,8 @@ automatically have the implied value of (first_spatial_col_index + 1).
 For all other types of RDDs, if last_spatial_col_index is unspecified, then
 it will assume the value of -1 (i.e., the last of all input columns).}
 
-\item{contains_non_geom_attributes}{Whether the input contains non-
-geometrical attributes (default: TRUE).}
+\item{has_non_spatial_attrs}{Whether the input contains non-spatial
+attributes.}
 
 \item{storage_level}{Storage level of the RDD (default: MEMORY_ONLY).}
 
@@ -59,6 +59,9 @@ Other Sedona data inferface functions:
 \code{\link{sedona_read_geojson}()},
 \code{\link{sedona_read_shapefile_to_typed_rdd}()},
 \code{\link{sedona_read_shapefile}()},
-\code{\link{sedona_read_wkb}()}
+\code{\link{sedona_read_wkb}()},
+\code{\link{sedona_write_geojson}()},
+\code{\link{sedona_write_wkb}()},
+\code{\link{sedona_write_wkt}()}
 }
 \concept{Sedona data inferface functions}

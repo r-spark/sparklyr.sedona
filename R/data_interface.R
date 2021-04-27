@@ -5,13 +5,13 @@
 #' @param location Location of the data source.
 #' @param type Type of the SpatialRDD (must be one of "point", "polygon", or
 #'   "linestring".
-#' @param contains_non_geom_attributes Whether the input contains non-
-#'   geometrical attributes (default: TRUE).
+#' @param has_non_spatial_attrs Whether the input contains non-spatial
+#'   attributes.
 #' @param storage_level Storage level of the RDD (default: MEMORY_ONLY).
 #' @param repartition The minimum number of partitions to have in the resulting
 #'   RDD (default: 1).
 #'
-#' @name sedona_typed_spatial_rdd_data_source
+#' @name sedona_spatial_rdd_data_source
 NULL
 
 #' Create a typed SpatialRDD from a delimiter-separated values data source.
@@ -23,7 +23,7 @@ NULL
 #' a contiguous range of columns (i.e.,
 #' [first_spatial_col_index, last_spatial_col_index]) are supported.
 #'
-#' @inheritParams sedona_typed_spatial_rdd_data_source
+#' @inheritParams sedona_spatial_rdd_data_source
 #' @param delimiter Delimiter within each record. Must be one of
 #'   ',', '\\t', '?', '\\'', '"', '_', '-', '\%', '~', '|', ';'
 #' @param first_spatial_col_index Zero-based index of the left-most column
@@ -44,7 +44,7 @@ sedona_read_dsv_to_typed_rdd <- function(
                                          type = c("point", "polygon", "linestring"),
                                          first_spatial_col_index = 0L,
                                          last_spatial_col_index = NULL,
-                                         contains_non_geom_attributes = TRUE,
+                                         has_non_spatial_attrs = TRUE,
                                          storage_level = "MEMORY_ONLY",
                                          repartition = 1L) {
   delimiter <- to_delimiter_enum_value(sc, match.arg(delimiter))
@@ -73,7 +73,7 @@ sedona_read_dsv_to_typed_rdd <- function(
         "org.apache.sedona.core.formatMapper.PointFormatMapper",
         first_spatial_col_index,
         delimiter,
-        contains_non_geom_attributes
+        has_non_spatial_attrs
       )
     } else {
       fmt_cls <- paste0(
@@ -92,7 +92,7 @@ sedona_read_dsv_to_typed_rdd <- function(
         first_spatial_col_index,
         last_spatial_col_index,
         delimiter,
-        contains_non_geom_attributes
+        has_non_spatial_attrs
       )
     }
   )
@@ -109,12 +109,36 @@ sedona_read_dsv_to_typed_rdd <- function(
     make_spatial_rdd(type)
 }
 
+#' Create a typed SpatialRDD from a shapefile data source.
+#'
+#' Create a typed SpatialRDD (namely, a PointRDD, a PolygonRDD, or a
+#' LineStringRDD) from a shapefile data source.
+#'
+#' @inheritParams sedona_spatial_rdd_data_source
+#'
+#' @export
+sedona_read_shapefile_to_typed_rdd <- function(
+                                               sc,
+                                               location,
+                                               type = c("point", "polygon", "linestring"),
+                                               storage_level = "MEMORY_ONLY") {
+  invoke_static(
+    sc,
+    "org.apache.sedona.core.formatMapper.shapefileParser.ShapefileReader",
+    paste0("readTo", to_camel_case(type), "RDD"),
+    java_context(sc),
+    location
+  ) %>%
+    set_storage_level(storage_level) %>%
+    make_spatial_rdd(type)
+}
+
 #' Create a typed SpatialRDD from a GeoJSON data source.
 #'
 #' Create a typed SpatialRDD (namely, a PointRDD, a PolygonRDD, or a
 #' LineStringRDD) from a GeoJSON data source.
 #'
-#' @inheritParams sedona_typed_spatial_rdd_data_source
+#' @inheritParams sedona_spatial_rdd_data_source
 #'
 #' @family Sedona data inferface functions
 #' @export
@@ -122,7 +146,7 @@ sedona_read_geojson_to_typed_rdd <- function(
                                              sc,
                                              location,
                                              type = c("point", "polygon", "linestring"),
-                                             contains_non_geom_attributes = TRUE,
+                                             has_non_spatial_attrs = TRUE,
                                              storage_level = "MEMORY_ONLY",
                                              repartition = 1L) {
   rdd_cls <- rdd_cls_from_type(type)
@@ -134,7 +158,7 @@ sedona_read_geojson_to_typed_rdd <- function(
     java_context(sc),
     location,
     delimiter,
-    contains_non_geom_attributes,
+    has_non_spatial_attrs,
     min(as.integer(repartition %||% 1L), 1L)
   ) %>%
     set_storage_level(storage_level) %>%
@@ -145,7 +169,7 @@ sedona_read_geojson_to_typed_rdd <- function(
 #'
 #' Create a generic SpatialRDD from a GeoJSON data source.
 #'
-#' @inheritParams sedona_typed_spatial_rdd_data_source
+#' @inheritParams sedona_spatial_rdd_data_source
 #' @param allow_invalid_geometries Whether to allow topology-invalid
 #'   geometries to exist in the resulting RDD.
 #' @param skip_syntactically_invalid_geometries Whether to allows Sedona to
@@ -184,7 +208,7 @@ sedona_read_geojson <- function(
 #' Create a generic SpatialRDD from a hex-encoded Well-Known Binary (WKB) data
 #' source.
 #'
-#' @inheritParams sedona_typed_spatial_rdd_data_source
+#' @inheritParams sedona_spatial_rdd_data_source
 #' @param wkb_col Zero-based index of column containing hex-encoded WKB data
 #'   (default: 0).
 #' @param allow_invalid_geometries Whether to allow topology-invalid
@@ -227,7 +251,7 @@ sedona_read_wkb <- function(
 #' Create a typed SpatialRDD (namely, a PointRDD, a PolygonRDD, or a
 #' LineStringRDD) from a shapefile data source.
 #'
-#' @inheritParams sedona_typed_spatial_rdd_data_source
+#' @inheritParams sedona_spatial_rdd_data_source
 #'
 #' @family Sedona data inferface functions
 #' @export
@@ -251,7 +275,7 @@ sedona_read_shapefile_to_typed_rdd <- function(
 #'
 #' Create a generic SpatialRDD from a shapefile data source.
 #'
-#' @inheritParams sedona_typed_spatial_rdd_data_source
+#' @inheritParams sedona_spatial_rdd_data_source
 #'
 #' @family Sedona data inferface functions
 #' @export
@@ -268,6 +292,52 @@ sedona_read_shapefile <- function(
   ) %>%
     set_storage_level(storage_level) %>%
     make_spatial_rdd(NULL)
+}
+
+#' Write SpatialRDD into a file.
+#'
+#' Export serialized data from a Sedona SpatialRDD into an output file.
+#'
+#' @param x The SpatialRDD object.
+#' @param output_location Location of the output file.
+#'
+#' @name sedona_spatial_rdd_serialization_routines
+NULL
+
+#' Write SpatialRDD into a WKB file.
+#'
+#' Export serialized data from a Sedona SpatialRDD into a WKB file.
+#'
+#' @inheritParams sedona_spatial_rdd_serialization_routines
+#'
+#' @family Sedona data inferface functions
+#' @export
+sedona_write_wkb <- function(x, output_location) {
+  invoke(x$.jobj, "saveAsWKB", output_location)
+}
+
+#' Write SpatialRDD into a WKT file.
+#'
+#' Export serialized data from a Sedona SpatialRDD into a WKT file.
+#'
+#' @inheritParams sedona_spatial_rdd_serialization_routines
+#'
+#' @family Sedona data inferface functions
+#' @export
+sedona_write_wkt <- function(x, output_location) {
+  invoke(x$.jobj, "saveAsWKT", output_location)
+}
+
+#' Write SpatialRDD into a GeoJSON file.
+#'
+#' Export serialized data from a Sedona SpatialRDD into a GeoJSON file.
+#'
+#' @inheritParams sedona_spatial_rdd_serialization_routines
+#'
+#' @family Sedona data inferface functions
+#' @export
+sedona_write_geojson <- function(x, output_location) {
+  invoke(x$.jobj, "saveAsGeoJSON", output_location)
 }
 
 rdd_cls_from_type <- function(type = c("point", "polygon", "linestring")) {
