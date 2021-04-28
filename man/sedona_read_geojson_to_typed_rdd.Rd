@@ -8,7 +8,7 @@ sedona_read_geojson_to_typed_rdd(
   sc,
   location,
   type = c("point", "polygon", "linestring"),
-  contains_non_geom_attributes = TRUE,
+  has_non_spatial_attrs = TRUE,
   storage_level = "MEMORY_ONLY",
   repartition = 1L
 )
@@ -21,8 +21,8 @@ sedona_read_geojson_to_typed_rdd(
 \item{type}{Type of the SpatialRDD (must be one of "point", "polygon", or
 "linestring".}
 
-\item{contains_non_geom_attributes}{Whether the input contains non-
-geometrical attributes (default: TRUE).}
+\item{has_non_spatial_attrs}{Whether the input contains non-spatial
+attributes.}
 
 \item{storage_level}{Storage level of the RDD (default: MEMORY_ONLY).}
 
@@ -39,6 +39,9 @@ Other Sedona data inferface functions:
 \code{\link{sedona_read_geojson}()},
 \code{\link{sedona_read_shapefile_to_typed_rdd}()},
 \code{\link{sedona_read_shapefile}()},
-\code{\link{sedona_read_wkb}()}
+\code{\link{sedona_read_wkb}()},
+\code{\link{sedona_write_geojson}()},
+\code{\link{sedona_write_wkb}()},
+\code{\link{sedona_write_wkt}()}
 }
 \concept{Sedona data inferface functions}

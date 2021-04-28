@@ -2,6 +2,49 @@ context("data interface")
 
 sc <- testthat_spark_connection()
 
+test_rdd_with_non_spatial_attrs <- invoke_new(
+  sc,
+  "org.apache.sedona.core.spatialRDD.PointRDD",
+  java_context(sc),
+  test_data("arealm-small.csv"),
+  1L, # offset
+  sc$state$enums$delimiter$CSV,
+  TRUE,
+  1L, # numPartitions
+  sc$state$object_cache$storage_levels$memory_only
+) %>%
+  sparklyr.sedona:::make_spatial_rdd("point")
+
+expect_result_matches_original <- function(pt_rdd) {
+  expect_equal(
+    pt_rdd %>% invoke("%>%", list("rawSpatialRDD"), list("count")),
+    test_rdd_with_non_spatial_attrs$.jobj %>%
+      invoke("%>%", list("rawSpatialRDD"), list("count"))
+  )
+  expect_geom_equal(
+    sc,
+    test_rdd_with_non_spatial_attrs$.jobj %>%
+      invoke("%>%", list("rawSpatialRDD"), list("takeOrdered", 5L), list("toArray")),
+    pt_rdd %>%
+      invoke("%>%", list("rawSpatialRDD"), list("takeOrdered", 5L), list("toArray"))
+  )
+}
+
+expect_geom_equal <- function(sc, lhs, rhs) {
+  expect_equal(length(lhs), length(rhs))
+  for (i in seq_along(lhs)) {
+    expect_true(
+      invoke_static(
+        sc,
+        "org.apache.sedona.core.utils.GeomUtils",
+        "equalsExactGeom",
+        lhs[[i]],
+        rhs[[i]]
+      )
+    )
+  }
+}
+
 test_that("sedona_read_dsv_to_typed_rdd() creates PointRDD correctly", {
   pt_rdd <- sedona_read_dsv_to_typed_rdd(
     sc,
@@ -9,7 +52,7 @@ test_that("sedona_read_dsv_to_typed_rdd() creates PointRDD correctly", {
     delimiter = ",",
     type = "point",
     first_spatial_col_index = 1,
-    contains_non_geom_attributes = TRUE
+    has_non_spatial_attrs = TRUE
   )
 
   expect_equal(class(pt_rdd), c("point_rdd", "spatial_rdd"))
@@ -37,7 +80,7 @@ test_that("sedona_read_dsv_to_typed_rdd() creates PolygonRDD correctly", {
     delimiter = ",",
     type = "polygon",
     first_spatial_col_index = 0,
-    contains_non_geom_attributes = FALSE
+    has_non_spatial_attrs = FALSE
   )
 
   expect_equal(class(polygon_rdd), c("polygon_rdd", "spatial_rdd"))
@@ -52,7 +95,7 @@ test_that("sedona_read_dsv_to_typed_rdd() creates LineStringRDD correctly", {
     delimiter = ",",
     type = "linestring",
     first_spatial_col_index = 0,
-    contains_non_geom_attributes = FALSE
+    has_non_spatial_attrs = FALSE
   )
 
   expect_equal(class(linestring_rdd), c("linestring_rdd", "spatial_rdd"))
@@ -65,7 +108,7 @@ test_that("sedona_read_geojson_to_typed_rdd() creates PointRDD correctly", {
     sc,
     location = test_data("arealm-small.json"),
     type = "point",
-    contains_non_geom_attributes = TRUE
+    has_non_spatial_attrs = TRUE
   )
 
   expect_equal(class(pt_rdd), c("point_rdd", "spatial_rdd"))
@@ -91,7 +134,7 @@ test_that("sedona_read_geojson_to_typed_rdd() creates PolygonRDD correctly", {
     sc,
     location = test_data("polygon.json"),
     type = "polygon",
-    contains_non_geom_attributes = TRUE
+    has_non_spatial_attrs = TRUE
   )
 
   expect_equal(class(polygon_rdd), c("polygon_rdd", "spatial_rdd"))
@@ -221,4 +264,58 @@ test_that("sedona_read_shapefile() works as expected", {
   expect_equal(
     wkb_rdd$.jobj %>% invoke("%>%", list("rawSpatialRDD"), list("count")), 10000
   )
+})
+
+test_that("sedona_write_wkb() works as expected", {
+  output_location <- tempfile()
+  sedona_write_wkb(test_rdd_with_non_spatial_attrs, output_location)
+  pt_rdd <- invoke_new(
+    sc,
+    "org.apache.sedona.core.spatialRDD.PointRDD",
+    java_context(sc),
+    output_location,
+    0L, # offset
+    sc$state$enums$delimiter$WKB,
+    TRUE,
+    1L, # numPartitions
+    sc$state$object_cache$storage_levels$memory_only
+  )
+
+  expect_result_matches_original(pt_rdd)
+})
+
+test_that("sedona_write_wkt() works as expected", {
+  output_location <- tempfile()
+  sedona_write_wkt(test_rdd_with_non_spatial_attrs, output_location)
+  pt_rdd <- invoke_new(
+    sc,
+    "org.apache.sedona.core.spatialRDD.PointRDD",
+    java_context(sc),
+    output_location,
+    0L, # offset
+    sc$state$enums$delimiter$WKT,
+    TRUE,
+    1L, # numPartitions
+    sc$state$object_cache$storage_levels$memory_only
+  )
+
+  expect_result_matches_original(pt_rdd)
+})
+
+test_that("sedona_write_geojson() works as expected", {
+  output_location <- tempfile()
+  sedona_write_geojson(test_rdd_with_non_spatial_attrs, output_location)
+  pt_rdd <- invoke_new(
+    sc,
+    "org.apache.sedona.core.spatialRDD.PointRDD",
+    java_context(sc),
+    output_location,
+    0L, # offset
+    sc$state$enums$delimiter$GEOJSON,
+    TRUE,
+    1L, # numPartitions
+    sc$state$object_cache$storage_levels$memory_only
+  )
+
+  expect_result_matches_original(pt_rdd)
 })
