@@ -25,10 +25,20 @@ jobs:
             env:
               SPARK_VERSION: '2.4.0'
               JAVA_VERSION: 'openjdk8'
+          - name: 'Spark 2.4.5 (R oldrel, openjdk8)'
+            r: 'oldrel'
+            env:
+              SPARK_VERSION: '2.4.7'
+              JAVA_VERSION: 'openjdk8'
           - name: 'Spark 2.4.5 (R release, openjdk8)'
             r: 'release'
             env:
-              SPARK_VERSION: '2.4.5'
+              SPARK_VERSION: '2.4.7'
+              JAVA_VERSION: 'openjdk8'
+          - name: 'Spark 3.0.0 (R oldrel, openjdk8)'
+            r: 'oldrel'
+            env:
+              SPARK_VERSION: '3.0.0'
               JAVA_VERSION: 'openjdk8'
           - name: 'Spark 3.0.0 (R release, openjdk8)'
             r: 'release'
