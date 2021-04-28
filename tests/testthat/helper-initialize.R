@@ -51,3 +51,18 @@ expect_boundary_envelope <- function(rdd, expected) {
 
   expect_equal(actual, expected)
 }
+
+expect_geom_equal <- function(sc, lhs, rhs) {
+  expect_equal(length(lhs), length(rhs))
+  for (i in seq_along(lhs)) {
+    expect_true(
+      invoke_static(
+        sc,
+        "org.apache.sedona.core.utils.GeomUtils",
+        "equalsExactGeom",
+        lhs[[i]],
+        rhs[[i]]
+      )
+    )
+  }
+}
