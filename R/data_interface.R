@@ -35,17 +35,18 @@ NULL
 #'   For all other types of RDDs, if last_spatial_col_index is unspecified, then
 #'   it will assume the value of -1 (i.e., the last of all input columns).
 #'
+#' @family Sedona data inferface functions
 #' @export
-sedona_read_typed_dsv <- function(
-                                  sc,
-                                  location,
-                                  delimiter = c(",", "\t", "?", "'", "\"", "_", "-", "%", "~", "|", ";"),
-                                  type = c("point", "polygon", "linestring"),
-                                  first_spatial_col_index = 0L,
-                                  last_spatial_col_index = NULL,
-                                  contains_non_geom_attributes = TRUE,
-                                  storage_level = "MEMORY_ONLY",
-                                  repartition = 1L) {
+sedona_read_dsv_to_typed_rdd <- function(
+                                         sc,
+                                         location,
+                                         delimiter = c(",", "\t", "?", "'", "\"", "_", "-", "%", "~", "|", ";"),
+                                         type = c("point", "polygon", "linestring"),
+                                         first_spatial_col_index = 0L,
+                                         last_spatial_col_index = NULL,
+                                         contains_non_geom_attributes = TRUE,
+                                         storage_level = "MEMORY_ONLY",
+                                         repartition = 1L) {
   delimiter <- to_delimiter_enum_value(sc, match.arg(delimiter))
   rdd_cls <- rdd_cls_from_type(type)
   first_spatial_col_index <- as.integer(first_spatial_col_index)
@@ -108,30 +109,6 @@ sedona_read_typed_dsv <- function(
     make_spatial_rdd(type)
 }
 
-#' Create a typed SpatialRDD from a shapefile data source.
-#'
-#' Create a typed SpatialRDD (namely, a PointRDD, a PolygonRDD, or a
-#' LineStringRDD) from a shapefile data source.
-#'
-#' @inheritParams sedona_typed_spatial_rdd_data_source
-#'
-#' @export
-sedona_read_typed_shapefile <- function(
-                                        sc,
-                                        location,
-                                        type = c("point", "polygon", "linestring"),
-                                        storage_level = "MEMORY_ONLY") {
-  invoke_static(
-    sc,
-    "org.apache.sedona.core.formatMapper.shapefileParser.ShapefileReader",
-    paste0("readTo", to_camel_case(type), "RDD"),
-    java_context(sc),
-    location
-  ) %>%
-    set_storage_level(storage_level) %>%
-    make_spatial_rdd(type)
-}
-
 #' Create a typed SpatialRDD from a GeoJSON data source.
 #'
 #' Create a typed SpatialRDD (namely, a PointRDD, a PolygonRDD, or a
@@ -139,14 +116,15 @@ sedona_read_typed_shapefile <- function(
 #'
 #' @inheritParams sedona_typed_spatial_rdd_data_source
 #'
+#' @family Sedona data inferface functions
 #' @export
-sedona_read_typed_geojson <- function(
-                                      sc,
-                                      location,
-                                      type = c("point", "polygon", "linestring"),
-                                      contains_non_geom_attributes = TRUE,
-                                      storage_level = "MEMORY_ONLY",
-                                      repartition = 1L) {
+sedona_read_geojson_to_typed_rdd <- function(
+                                             sc,
+                                             location,
+                                             type = c("point", "polygon", "linestring"),
+                                             contains_non_geom_attributes = TRUE,
+                                             storage_level = "MEMORY_ONLY",
+                                             repartition = 1L) {
   rdd_cls <- rdd_cls_from_type(type)
   delimiter <- sc$state$enums$delimiter$GEOJSON
 
@@ -174,6 +152,7 @@ sedona_read_typed_geojson <- function(
 #'   automatically skip syntax-invalid geometries, rather than throwing
 #'   errorings.
 #'
+#' @family Sedona data inferface functions
 #' @export
 sedona_read_geojson <- function(
                                 sc,
@@ -214,6 +193,7 @@ sedona_read_geojson <- function(
 #'   automatically skip syntax-invalid geometries, rather than throwing
 #'   errorings.
 #'
+#' @family Sedona data inferface functions
 #' @export
 sedona_read_wkb <- function(
                             sc,
@@ -237,6 +217,54 @@ sedona_read_wkb <- function(
     as.integer(wkb_col),
     allow_invalid_geometries,
     skip_syntactically_invalid_geometries
+  ) %>%
+    set_storage_level(storage_level) %>%
+    make_spatial_rdd(NULL)
+}
+
+#' Create a typed SpatialRDD from a shapefile data source.
+#'
+#' Create a typed SpatialRDD (namely, a PointRDD, a PolygonRDD, or a
+#' LineStringRDD) from a shapefile data source.
+#'
+#' @inheritParams sedona_typed_spatial_rdd_data_source
+#'
+#' @family Sedona data inferface functions
+#' @export
+sedona_read_shapefile_to_typed_rdd <- function(
+                                               sc,
+                                               location,
+                                               type = c("point", "polygon", "linestring"),
+                                               storage_level = "MEMORY_ONLY") {
+  invoke_static(
+    sc,
+    "org.apache.sedona.core.formatMapper.shapefileParser.ShapefileReader",
+    paste0("readTo", to_camel_case(type), "RDD"),
+    java_context(sc),
+    location
+  ) %>%
+    set_storage_level(storage_level) %>%
+    make_spatial_rdd(type)
+}
+
+#' Create a SpatialRDD from a shapefile data source.
+#'
+#' Create a generic SpatialRDD from a shapefile data source.
+#'
+#' @inheritParams sedona_typed_spatial_rdd_data_source
+#'
+#' @family Sedona data inferface functions
+#' @export
+sedona_read_shapefile <- function(
+                                  sc,
+                                  location,
+                                  storage_level = "MEMORY_ONLY") {
+  invoke_static(
+    sc,
+    "org.apache.sedona.core.formatMapper.shapefileParser.ShapefileReader",
+    paste0("readToGeometryRDD"),
+    java_context(sc),
+    location
   ) %>%
     set_storage_level(storage_level) %>%
     make_spatial_rdd(NULL)

@@ -2,8 +2,8 @@ context("data interface")
 
 sc <- testthat_spark_connection()
 
-test_that("sedona_read_typed_dsv() creates PointRDD correctly", {
-  pt_rdd <- sedona_read_typed_dsv(
+test_that("sedona_read_dsv_to_typed_rdd() creates PointRDD correctly", {
+  pt_rdd <- sedona_read_dsv_to_typed_rdd(
     sc,
     location = test_data("arealm-small.csv"),
     delimiter = ",",
@@ -30,8 +30,8 @@ test_that("sedona_read_typed_dsv() creates PointRDD correctly", {
   }
 })
 
-test_that("sedona_read_typed_dsv() creates PolygonRDD correctly", {
-  polygon_rdd <- sedona_read_typed_dsv(
+test_that("sedona_read_dsv_to_typed_rdd() creates PolygonRDD correctly", {
+  polygon_rdd <- sedona_read_dsv_to_typed_rdd(
     sc,
     location = test_data("primaryroads-polygon.csv"),
     delimiter = ",",
@@ -45,8 +45,8 @@ test_that("sedona_read_typed_dsv() creates PolygonRDD correctly", {
   expect_boundary_envelope(polygon_rdd, c(-158.104182, -66.03575, 17.986328, 48.645133))
 })
 
-test_that("sedona_read_typed_dsv() creates LineStringRDD correctly", {
-  linestring_rdd <- sedona_read_typed_dsv(
+test_that("sedona_read_dsv_to_typed_rdd() creates LineStringRDD correctly", {
+  linestring_rdd <- sedona_read_dsv_to_typed_rdd(
     sc,
     location = test_data("primaryroads-linestring.csv"),
     delimiter = ",",
@@ -60,8 +60,8 @@ test_that("sedona_read_typed_dsv() creates LineStringRDD correctly", {
   expect_boundary_envelope(linestring_rdd, c(-123.393766, -65.648659, 17.982169, 49.002374))
 })
 
-test_that("sedona_read_typed_geojson() creates PointRDD correctly", {
-  pt_rdd <- sedona_read_typed_geojson(
+test_that("sedona_read_geojson_to_typed_rdd() creates PointRDD correctly", {
+  pt_rdd <- sedona_read_geojson_to_typed_rdd(
     sc,
     location = test_data("arealm-small.json"),
     type = "point",
@@ -86,8 +86,8 @@ test_that("sedona_read_typed_geojson() creates PointRDD correctly", {
   }
 })
 
-test_that("sedona_read_typed_geojson() creates PolygonRDD correctly", {
-  polygon_rdd <- sedona_read_typed_geojson(
+test_that("sedona_read_geojson_to_typed_rdd() creates PolygonRDD correctly", {
+  polygon_rdd <- sedona_read_geojson_to_typed_rdd(
     sc,
     location = test_data("polygon.json"),
     type = "polygon",
@@ -173,8 +173,8 @@ test_that("sedona_read_wkb() works as expected", {
   )
 })
 
-test_that("sedona_read_typed_shapefile() creates PointRDD correctly", {
-  pt_rdd <- sedona_read_typed_shapefile(
+test_that("sedona_read_shapefile_to_typed_rdd() creates PointRDD correctly", {
+  pt_rdd <- sedona_read_shapefile_to_typed_rdd(
     sc,
     location = test_data("point"),
     type = "point"
@@ -187,8 +187,8 @@ test_that("sedona_read_typed_shapefile() creates PointRDD correctly", {
   )
 })
 
-test_that("sedona_read_typed_shapefile() creates PolygonRDD correctly", {
-  polygon_rdd <- sedona_read_typed_shapefile(
+test_that("sedona_read_shapefile_to_typed_rdd() creates PolygonRDD correctly", {
+  polygon_rdd <- sedona_read_shapefile_to_typed_rdd(
     sc,
     location = test_data("polygon"),
     type = "polygon"
@@ -201,8 +201,8 @@ test_that("sedona_read_typed_shapefile() creates PolygonRDD correctly", {
   )
 })
 
-test_that("sedona_read_typed_shapefile() creates LineStringRDD correctly", {
-  linestring_rdd <- sedona_read_typed_shapefile(
+test_that("sedona_read_shapefile_to_typed_rdd() creates LineStringRDD correctly", {
+  linestring_rdd <- sedona_read_shapefile_to_typed_rdd(
     sc,
     location = test_data("polyline"),
     type = "linestring"
@@ -212,5 +212,13 @@ test_that("sedona_read_typed_shapefile() creates LineStringRDD correctly", {
   expect_equal(
     linestring_rdd$.jobj %>% invoke("%>%", list("rawSpatialRDD"), list("count")),
     15137
+  )
+})
+
+test_that("sedona_read_shapefile() works as expected", {
+  wkb_rdd <- sedona_read_shapefile(sc, test_data("polygon"))
+
+  expect_equal(
+    wkb_rdd$.jobj %>% invoke("%>%", list("rawSpatialRDD"), list("count")), 10000
   )
 })

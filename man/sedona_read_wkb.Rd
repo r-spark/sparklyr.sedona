@@ -38,3 +38,12 @@ RDD (default: 1).}
 Create a generic SpatialRDD from a hex-encoded Well-Known Binary (WKB) data
 source.
 }
+\seealso{
+Other Sedona data inferface functions: 
+\code{\link{sedona_read_dsv_to_typed_rdd}()},
+\code{\link{sedona_read_geojson_to_typed_rdd}()},
+\code{\link{sedona_read_geojson}()},
+\code{\link{sedona_read_shapefile_to_typed_rdd}()},
+\code{\link{sedona_read_shapefile}()}
+}
+\concept{Sedona data inferface functions}
