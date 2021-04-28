@@ -305,28 +305,28 @@ test_that("sedona_write_geojson() works as expected", {
   expect_result_matches_original(pt_rdd)
 })
 
-test_that("sedona_save_spatial_rdd() works as expected for WKB format", {
-  fmt <- "wkb"
-  # TODO: create similar test cases for WKT and GeoJSON formats
-  location <- tempfile(pattern = "pt_", fileext = paste0(".", fmt))
-  copy_to(
-    sc, tibble::tibble(id = 1, name = "a point", type = "point")
-  ) %>%
-    dplyr::mutate(
-      pt = dplyr::sql(
-        "ST_Point(CAST(123 AS Decimal(24, 20)), CAST(456 AS Decimal(24, 20)))"
-      )
+test_that("sedona_save_spatial_rdd() works as expected for WKB and WKT formats", {
+  for (fmt in c("wkb", "wkt")) {
+    location <- tempfile(pattern = "pt_", fileext = paste0(".", fmt))
+    copy_to(
+      sc, tibble::tibble(id = 1, name = "a point", type = "point")
     ) %>%
-  sedona_save_spatial_rdd(
-    spatial_col = "pt", output_location = location, output_format = fmt
-  )
-  sdf <- do.call(paste0("sedona_read_", fmt), list(sc, location))
+      dplyr::mutate(
+        pt = dplyr::sql(
+          "ST_Point(CAST(123 AS Decimal(24, 20)), CAST(456 AS Decimal(24, 20)))"
+        )
+      ) %>%
+    sedona_save_spatial_rdd(
+      spatial_col = "pt", output_location = location, output_format = fmt
+    )
+    sdf <- do.call(paste0("sedona_read_", fmt), list(sc, location))
 
-  expect_equal(
-    sdf$.jobj %>% invoke("%>%", list("rawSpatialRDD"), list("count")), 1
-  )
-  pts <- sdf$.jobj %>%
-    invoke("%>%", list("rawSpatialRDD"), list("takeOrdered", 1L))
-  expect_equal(pts[[1]] %>% invoke("getX"), 123)
-  expect_equal(pts[[1]] %>% invoke("getY"), 456)
+    expect_equal(
+      sdf$.jobj %>% invoke("%>%", list("rawSpatialRDD"), list("count")), 1
+    )
+    pts <- sdf$.jobj %>%
+      invoke("%>%", list("rawSpatialRDD"), list("takeOrdered", 1L))
+    expect_equal(pts[[1]] %>% invoke("getX"), 123)
+    expect_equal(pts[[1]] %>% invoke("getY"), 456)
+  }
 })

@@ -42,6 +42,7 @@ Other Sedona data inferface functions:
 \code{\link{sedona_read_geojson}()},
 \code{\link{sedona_read_shapefile}()},
 \code{\link{sedona_read_wkb}()},
+\code{\link{sedona_read_wkt}()},
 \code{\link{sedona_save_spatial_rdd}()},
 \code{\link{sedona_write_geojson}()},
 \code{\link{sedona_write_wkb}()},
