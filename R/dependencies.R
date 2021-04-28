@@ -14,7 +14,7 @@ spark_dependencies <- function(spark_version, scala_version, ...) {
       c(
         paste0(
           "org.apache.sedona:sedona-",
-          c("core", "sql"),
+          c("core", "sql", "viz"),
           sprintf("-%s_%s:1.0.0-incubating", spark_version, scala_version)
         ),
         "org.datasyslab:geotools-wrapper:geotools-24.0",
@@ -69,6 +69,16 @@ spark_dependencies <- function(spark_version, scala_version, ...) {
       sc$state$object_cache$storage_levels$memory_only <- invoke_static(
         sc, "org.apache.spark.storage.StorageLevel", "MEMORY_ONLY"
       )
+      for (image_type in c("PNG", "GIF", "SVG")) {
+        sc$state$object_cache$image_types[[image_type]] <- invoke_static(
+          sc, "org.apache.sedona.viz.utils.ImageType", image_type
+        )
+      }
+      for (color in c("red", "green", "blue")) {
+        sc$state$object_cache$awt_color[[color]] <- invoke_static(
+          sc, "java.awt.Color", toupper(color)
+        )
+      }
 
       lockBinding(sym = "enums", env = sc$state)
     }
@@ -78,7 +88,7 @@ spark_dependencies <- function(spark_version, scala_version, ...) {
 .onAttach <- function(libname, pkgname) {
   options(spark.serializer = "org.apache.spark.serializer.KryoSerializer")
   options(
-    spark.kryo.registrator = "org.apache.sedona.core.serde.SedonaKryoRegistrator"
+    spark.kryo.registrator = "org.apache.sedona.viz.core.Serde.SedonaVizKryoRegistrator"
   )
 }
 .onLoad <- function(libname, pkgname) {
