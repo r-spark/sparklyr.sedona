@@ -305,8 +305,8 @@ test_that("sedona_write_geojson() works as expected", {
   expect_result_matches_original(pt_rdd)
 })
 
-test_that("sedona_save_spatial_rdd() works as expected for WKB and WKT formats", {
-  for (fmt in c("wkb", "wkt")) {
+test_that("sedona_save_spatial_rdd() works as expected", {
+  for (fmt in c("wkb", "wkt", "geojson")) {
     location <- tempfile(pattern = "pt_", fileext = paste0(".", fmt))
     copy_to(
       sc, tibble::tibble(id = 1, name = "a point", type = "point")
@@ -328,5 +328,6 @@ test_that("sedona_save_spatial_rdd() works as expected for WKB and WKT formats",
       invoke("%>%", list("rawSpatialRDD"), list("takeOrdered", 1L))
     expect_equal(pts[[1]] %>% invoke("getX"), 123)
     expect_equal(pts[[1]] %>% invoke("getY"), 456)
+    expect_equal(pts[[1]] %>% invoke("getUserData"), "1.0\ta point\tpoint")
   }
 })
