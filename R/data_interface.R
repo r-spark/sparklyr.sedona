@@ -233,6 +233,7 @@ sedona_read_wkb <- function(
     location,
     min(as.integer(repartition %||% 1L), 1L)
   )
+
   invoke_static(
     sc,
     "org.apache.sedona.core.formatMapper.WkbReader",
@@ -338,6 +339,33 @@ sedona_write_wkt <- function(x, output_location) {
 #' @export
 sedona_write_geojson <- function(x, output_location) {
   invoke(x$.jobj, "saveAsGeoJSON", output_location)
+}
+
+#' Save a Spark dataframe containing exactly 1 spatial column into a file.
+#'
+#' Export serialized data from a Spark dataframe containing exactly 1 spatial
+#' column into a file.
+#'
+#' @param x A Spark dataframe object in sparklyr or a dplyr expression
+#'   representing a Spark SQL query.
+#' @param spatial_col The name of the spatial column.
+#' @param output_location Location of the output file.
+#' @param output_format Format of the output.
+#'
+#' @family Sedona data inferface functions
+#' @export
+sedona_save_spatial_rdd <- function(
+                                    x,
+                                    spatial_col,
+                                    output_location,
+                                    output_format = c("wkb", "wkt", "geojson")) {
+  spatial_rdd <- to_spatial_rdd(x, spatial_col)
+  output_format <- match.arg(output_format)
+
+  do.call(
+    paste0("sedona_write_", output_format),
+    list(spatial_rdd, output_location)
+  )
 }
 
 rdd_cls_from_type <- function(type = c("point", "polygon", "linestring")) {
