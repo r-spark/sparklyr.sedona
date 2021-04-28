@@ -247,6 +247,49 @@ sedona_read_wkb <- function(
     make_spatial_rdd(NULL)
 }
 
+#' Create a SpatialRDD from a Well-Known Text (WKT) data source.
+#'
+#' Create a generic SpatialRDD from a Well-Known Text (WKT) data source.
+#'
+#' @inheritParams sedona_spatial_rdd_data_source
+#' @param wkb_col Zero-based index of column containing hex-encoded WKB data
+#'   (default: 0).
+#' @param allow_invalid_geometries Whether to allow topology-invalid
+#'   geometries to exist in the resulting RDD.
+#' @param skip_syntactically_invalid_geometries Whether to allows Sedona to
+#'   automatically skip syntax-invalid geometries, rather than throwing
+#'   errorings.
+#'
+#' @family Sedona data inferface functions
+#' @export
+sedona_read_wkt <- function(
+                            sc,
+                            location,
+                            wkt_col = 0L,
+                            allow_invalid_geometries = TRUE,
+                            skip_syntactically_invalid_geometries = TRUE,
+                            storage_level = "MEMORY_ONLY",
+                            repartition = 1L) {
+  raw_text_rdd <- invoke(
+    java_context(sc),
+    "textFile",
+    location,
+    min(as.integer(repartition %||% 1L), 1L)
+  )
+
+  invoke_static(
+    sc,
+    "org.apache.sedona.core.formatMapper.WktReader",
+    "readToGeometryRDD",
+    raw_text_rdd,
+    as.integer(wkt_col),
+    allow_invalid_geometries,
+    skip_syntactically_invalid_geometries
+  ) %>%
+    set_storage_level(storage_level) %>%
+    make_spatial_rdd(NULL)
+}
+
 #' Create a typed SpatialRDD from a shapefile data source.
 #'
 #' Create a typed SpatialRDD (namely, a PointRDD, a PolygonRDD, or a
