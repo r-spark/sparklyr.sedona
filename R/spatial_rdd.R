@@ -24,6 +24,44 @@ to_spatial_rdd <- function(x, spatial_col) {
     make_spatial_rdd(NULL)
 }
 
+#' Spatial RDD aggregation routine
+#'
+#' Function extracting aggregate statistics from a Sedona spatial RDD.
+#'
+#' @param x A Sedona spatial RDD.
+#'
+#' @name sedona_spatial_rdd_aggregation_routine
+NULL
+
+#' Find the minimal bounding box of a geometry.
+#'
+#' Given a Sedona spatial RDD, find the axis-aligned minimal bounding box of the
+#' geometry represented by the RDD.
+#'
+#' @inheritParams sedona_spatial_rdd_aggregation_routine
+#'
+#' @family Spatial RDD aggregation routine
+#' @export
+minimum_bounding_box <- function(x) {
+  x$.jobj %>%
+    invoke("boundary") %>%
+    make_bounding_box()
+}
+
+#' Find the approximate total number of records within a Spatial RDD.
+#'
+#' Given a Sedona spatial RDD, find the (possibly approximated) number of total
+#' records within it.
+#'
+#' @inheritParams sedona_spatial_rdd_aggregation_routine
+#'
+#' @family Spatial RDD aggregation routine
+#' @export
+approx_count <- function(x) {
+  x$.jobj %>%
+    invoke("approximateTotalCount")
+}
+
 make_spatial_rdd <- function(jobj, type, ...) {
   structure(list(.jobj = jobj), class = paste0(c(type, "spatial"), "_rdd"))
 }
