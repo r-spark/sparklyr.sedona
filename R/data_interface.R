@@ -345,14 +345,14 @@ sedona_read_shapefile <- function(
 #' @param x The SpatialRDD object.
 #' @param output_location Location of the output file.
 #'
-#' @name sedona_spatial_rdd_serialization_routines
+#' @name sedona_spatial_rdd_serialization_routine
 NULL
 
 #' Write SpatialRDD into a WKB file.
 #'
 #' Export serialized data from a Sedona SpatialRDD into a WKB file.
 #'
-#' @inheritParams sedona_spatial_rdd_serialization_routines
+#' @inheritParams sedona_spatial_rdd_serialization_routine
 #'
 #' @family Sedona data inferface functions
 #' @export
@@ -364,7 +364,7 @@ sedona_write_wkb <- function(x, output_location) {
 #'
 #' Export serialized data from a Sedona SpatialRDD into a WKT file.
 #'
-#' @inheritParams sedona_spatial_rdd_serialization_routines
+#' @inheritParams sedona_spatial_rdd_serialization_routine
 #'
 #' @family Sedona data inferface functions
 #' @export
@@ -376,7 +376,7 @@ sedona_write_wkt <- function(x, output_location) {
 #'
 #' Export serialized data from a Sedona SpatialRDD into a GeoJSON file.
 #'
-#' @inheritParams sedona_spatial_rdd_serialization_routines
+#' @inheritParams sedona_spatial_rdd_serialization_routine
 #'
 #' @family Sedona data inferface functions
 #' @export
