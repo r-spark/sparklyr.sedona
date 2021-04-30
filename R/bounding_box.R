@@ -1,17 +1,3 @@
-#' Find axis-aligned minimum bounding box of a geometry.
-#'
-#' Given a spatial RDD, find an axis-aligned minimum bounding box (envelope)
-#' containing the geometrical object(s) represented by the RDD.
-#'
-#' @param x A spatial RDD.
-#'
-#' @export
-bounding_box <- function(x) {
-  x$.jobj %>%
-    invoke("boundary") %>%
-    make_bounding_box()
-}
-
 #' Construct a bounding box object.
 #'
 #' Construct a axis-aligned rectangular bounding box object.

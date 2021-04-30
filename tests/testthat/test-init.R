@@ -11,7 +11,7 @@ test_that("required runtime configurations are initialized correctly", {
   )
   expect_equal(
     conf %>% invoke("get", "spark.kryo.registrator"),
-    "org.apache.sedona.core.serde.SedonaKryoRegistrator"
+    "org.apache.sedona.viz.core.Serde.SedonaVizKryoRegistrator"
   )
 })
 
