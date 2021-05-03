@@ -5,7 +5,7 @@
 \title{Visualize a Sedona spatial RDD using a scatter plot.}
 \usage{
 sedona_render_scatter_plot(
-  x,
+  rdd,
   resolution_x,
   resolution_y,
   output_location,
@@ -19,7 +19,7 @@ sedona_render_scatter_plot(
 )
 }
 \arguments{
-\item{x}{A Sedona spatial RDD.}
+\item{rdd}{A Sedona spatial RDD.}
 
 \item{resolution_x}{Resolution on the x-axis.}
 
@@ -59,6 +59,7 @@ Generate a scatter plot of geometrical object(s) within a Sedona spatial RDD.
 }
 \seealso{
 Other Sedona visualization routines: 
+\code{\link{sedona_render_choropleth_map}()},
 \code{\link{sedona_render_heatmap}()}
 }
 \concept{Sedona visualization routines}

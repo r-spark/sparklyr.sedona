@@ -3,7 +3,7 @@
 #' Generate a visual representation of geometrical object(s) within a Sedona
 #' spatial RDD.
 #'
-#' @param x A Sedona spatial RDD.
+#' @param rdd A Sedona spatial RDD.
 #' @param resolution_x Resolution on the x-axis.
 #' @param resolution_y Resolution on the y-axis.
 #' @param output_location Location of the output image. This should be the
@@ -40,7 +40,7 @@ NULL
 #' @family Sedona visualization routines
 #' @export
 sedona_render_heatmap <- function(
-                                  x,
+                                  rdd,
                                   resolution_x,
                                   resolution_y,
                                   output_location,
@@ -48,10 +48,10 @@ sedona_render_heatmap <- function(
                                   boundary = NULL,
                                   blur_radius = 10L,
                                   browse = interactive()) {
-  sc <- spark_connection(x$.jobj)
+  sc <- spark_connection(rdd$.jobj)
   output_format <- match.arg(output_format)
 
-  boundary <- validate_boundary(x, boundary)
+  boundary <- validate_boundary(rdd, boundary)
   viz_op <- invoke_new(
     sc,
     "org.apache.sedona.viz.extension.visualizationEffect.HeatMap",
@@ -62,7 +62,7 @@ sedona_render_heatmap <- function(
     as.integer(blur_radius)
   )
 
-  x %>% gen_raster_image(
+  rdd %>% gen_raster_image(
     viz_op = viz_op,
     output_location = output_location,
     output_format = output_format
@@ -85,7 +85,7 @@ sedona_render_heatmap <- function(
 #' @family Sedona visualization routines
 #' @export
 sedona_render_scatter_plot <- function(
-                                  x,
+                                  rdd,
                                   resolution_x,
                                   resolution_y,
                                   output_location,
@@ -96,31 +96,102 @@ sedona_render_scatter_plot <- function(
                                   shade = TRUE,
                                   reverse_coords = FALSE,
                                   browse = interactive()) {
-  sc <- spark_connection(x$.jobj)
+  sedona_render_viz_effect(
+    viz_effect_name = "ScatterPlot",
+    rdd = rdd,
+    resolution_x = resolution_x,
+    resolution_y = resolution_y,
+    output_location = output_location,
+    output_format = output_format,
+    boundary = boundary,
+    color_of_variation = color_of_variation,
+    base_color = base_color,
+    shade = shade,
+    reverse_coords = reverse_coords,
+    browse = browse
+  )
+}
+
+#' Visualize a Sedona spatial RDD using a choropleth map.
+#'
+#' Generate a choropleth map of a pair RDD assigning integral values to
+#' polygons.
+#'
+#' @inheritParams sedona_visualization_routines
+#' @param pair_rdd A pair RDD with Sedona Polygon objects being keys and
+#'   java.lang.Long being values.
+#' @param reverse_coords Whether to reverse spatial coordinates in the plot
+#'   (default: FALSE).
+#'
+#' @family Sedona visualization routines
+#' @export
+sedona_render_choropleth_map <- function(
+                                         pair_rdd,
+                                         resolution_x,
+                                         resolution_y,
+                                         output_location,
+                                         output_format = c("PNG", "GIF", "SVG"),
+                                         boundary = NULL,
+                                         color_of_variation = c("red", "green", "blue"),
+                                         base_color = c(0, 0, 0),
+                                         shade = TRUE,
+                                         reverse_coords = FALSE,
+                                         browse = interactive()) {
+  sedona_render_viz_effect(
+    viz_effect_name = "ChoroplethMap",
+    rdd = pair_rdd,
+    resolution_x = resolution_x,
+    resolution_y = resolution_y,
+    output_location = output_location,
+    output_format = output_format,
+    boundary = boundary,
+    color_of_variation = color_of_variation,
+    base_color = base_color,
+    shade = shade,
+    reverse_coords = reverse_coords,
+    browse = browse
+  )
+}
+
+sedona_render_viz_effect <- function(
+                                     viz_effect_name,
+                                     rdd,
+                                     resolution_x,
+                                     resolution_y,
+                                     output_location,
+                                     output_format = c("PNG", "GIF", "SVG"),
+                                     boundary = NULL,
+                                     color_of_variation = c("red", "green", "blue"),
+                                     base_color = c(0, 0, 0),
+                                     shade = shade,
+                                     reverse_coords = FALSE,
+                                     browse = interactive()) {
+  sc <- spark_connection(rdd$.jobj)
   output_format <- match.arg(output_format)
   color_of_variation <- match.arg(color_of_variation)
   validate_base_color(base_color)
 
-  boundary <- validate_boundary(x, boundary)
+  boundary <- validate_boundary(rdd, boundary)
   viz_op <- invoke_new(
     sc,
-    "org.apache.sedona.viz.extension.visualizationEffect.ScatterPlot",
+    paste0("org.apache.sedona.viz.extension.visualizationEffect.", viz_effect_name),
     as.integer(resolution_x),
     as.integer(resolution_y),
     boundary$.jobj,
     reverse_coords
   )
 
-  x %>% gen_raster_image(
-    viz_op = viz_op,
-    output_location = output_location,
-    output_format = output_format,
-    color_settings = list(
-      color_of_variation = color_of_variation,
-      base_color = base_color,
-      shade = TRUE
+  rdd %>%
+    gen_raster_image(
+      viz_op = viz_op,
+      output_location = output_location,
+      output_format = output_format,
+      color_settings = list(
+        color_of_variation = color_of_variation,
+        base_color = base_color,
+        shade = shade
+      )
     )
-  )
   if (browse) {
     browseURL(paste0(output_location, ".", tolower(output_format)))
   }
@@ -136,11 +207,11 @@ validate_base_color <- function(base_color) {
   }
 }
 
-validate_boundary <- function(x, boundary) {
-  sc <- spark_connection(x$.jobj)
+validate_boundary <- function(rdd, boundary) {
+  sc <- spark_connection(rdd$.jobj)
 
   if (is.null(boundary)) {
-    minimum_bounding_box(x)
+    minimum_bounding_box(rdd)
   } else if (inherits(boundary, "bounding_box")) {
     boundary
   } else if (is.numeric(boundary)) {
@@ -156,12 +227,12 @@ validate_boundary <- function(x, boundary) {
 }
 
 gen_raster_image <- function(
-                             x,
+                             rdd,
                              viz_op,
                              output_location,
                              output_format,
                              color_settings = NULL) {
-  sc <- spark_connection(x$.jobj)
+  sc <- spark_connection(rdd$.jobj)
 
   image_generator <- invoke_new(
     sc,
@@ -179,7 +250,7 @@ gen_raster_image <- function(
       )
     do.call(invoke, customize_color_params)
   }
-  invoke(viz_op, "Visualize", java_context(sc), x$.jobj)
+  invoke(viz_op, "Visualize", java_context(sc), rdd$.jobj)
   invoke(
     image_generator,
     "SaveRasterImageAsLocalFile",
