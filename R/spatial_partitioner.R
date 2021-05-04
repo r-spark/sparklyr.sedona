@@ -19,28 +19,28 @@
 #'   data structure.
 #'
 #' @export
-sedona_apply_spatial_partition <- function(
-                                           rdd,
-                                           partitioner = c("quadtree", "kdbtree"),
-                                           max_levels = NULL) {
-  apply_spatial_partition_impl(
+sedona_apply_spatial_partitioner <- function(
+                                             rdd,
+                                             partitioner = c("quadtree", "kdbtree"),
+                                             max_levels = NULL) {
+  apply_spatial_partitioner_impl(
     partitioner = partitioner,
     rdd = rdd,
     max_levels = max_levels
   )
 }
 
-apply_spatial_partition_impl <- function(
-                                      partitioner = c("quadtree", "kdbtree"),
-                                      rdd = NULL,
-                                      max_levels = NULL) {
-  UseMethod("apply_spatial_partition_impl")
+apply_spatial_partitioner_impl <- function(
+                                           partitioner = c("quadtree", "kdbtree"),
+                                           rdd = NULL,
+                                           max_levels = NULL) {
+  UseMethod("apply_spatial_partitioner_impl")
 }
 
-apply_spatial_partition_impl.character <- function(
-                                                   partitioner = c("quadtree", "kdbtree"),
-                                                   rdd = NULL,
-                                                   max_levels = NULL) {
+apply_spatial_partitioner_impl.character <- function(
+                                                     partitioner = c("quadtree", "kdbtree"),
+                                                     rdd = NULL,
+                                                     max_levels = NULL) {
   sc <- spark_connection(rdd$.jobj)
   grid_type <- sc$state$enums$grid_type[[match.arg(partitioner)]]
 
@@ -49,25 +49,26 @@ apply_spatial_partition_impl.character <- function(
     list(rdd$.jobj, "spatialPartitioning", grid_type) %>%
       append(as.integer(max_levels))
   )
-  rdd$.state$has_spatial_partitioning <- TRUE
+  rdd$.state$has_spatial_partitions <- TRUE
+  rdd$.state$spatial_partitioner_type <- partitioner
 }
 
-apply_spatial_partition_impl.spark_jobj <- function(
-                                                    partitioner = c("quadtree", "kdbtree"),
-                                                    rdd = NULL,
-                                                    max_levels = NULL) {
+apply_spatial_partitioner_impl.spark_jobj <- function(
+                                                      partitioner = c("quadtree", "kdbtree"),
+                                                      rdd = NULL,
+                                                      max_levels = NULL) {
   if (!is.null(max_levels)) {
     stop("Cannot specify `max_levels` for custom partitioner")
   }
 
   invoke(rdd$.jobj, "spatialPartitioning", partitioner)
-  rdd$.state$has_spatial_partitioning <- TRUE
+  rdd$.state$has_spatial_partitions <- TRUE
 }
 
-apply_spatial_partition_impl.default <- function(
-                                                 partitioner = c("quadtree", "kdbtree"),
-                                                 rdd = NULL,
-                                                 max_levels = NULL) {
+apply_spatial_partitioner_impl.default <- function(
+                                                   partitioner = c("quadtree", "kdbtree"),
+                                                   rdd = NULL,
+                                                   max_levels = NULL) {
   stop(
     "Unsupported partitioner type '",
     paste(class(partitioner), collapse = " "),

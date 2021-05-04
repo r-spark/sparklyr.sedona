@@ -37,7 +37,7 @@ test_that("sedona_build_index() works as expected on spatial partitions", {
     type = "point",
     repartition = 5
   )
-  sedona_apply_spatial_partition(pt_rdd, partitioner = "quadtree")
+  sedona_apply_spatial_partitioner(pt_rdd, partitioner = "quadtree")
   sedona_build_index(pt_rdd, type = "rtree")
   indexed_rdd <- invoke(pt_rdd$.jobj, "indexedRDD")
 
