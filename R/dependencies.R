@@ -66,19 +66,24 @@ spark_dependencies <- function(spark_version, scala_version, ...) {
           sc, "org.apache.sedona.core.enums.GeometryType", toupper(x)
         )
       }
-      sc$state$object_cache$storage_levels$memory_only <- invoke_static(
-        sc, "org.apache.spark.storage.StorageLevel", "MEMORY_ONLY"
-      )
+      for (x in c("quadtree", "rtree")) {
+        sc$state$enums$index_type[[x]] <- invoke_static(
+          sc, "org.apache.sedona.core.enums.IndexType", toupper(x)
+        )
+      }
       for (x in c("png", "gif", "svg")) {
-        sc$state$object_cache$image_types[[x]] <- invoke_static(
+        sc$state$enums$image_types[[x]] <- invoke_static(
           sc, "org.apache.sedona.viz.utils.ImageType", toupper(x)
         )
       }
       for (x in c("red", "green", "blue")) {
-        sc$state$object_cache$awt_color[[x]] <- invoke_static(
+        sc$state$enums$awt_color[[x]] <- invoke_static(
           sc, "java.awt.Color", toupper(x)
         )
       }
+      sc$state$object_cache$storage_levels$memory_only <- invoke_static(
+        sc, "org.apache.spark.storage.StorageLevel", "MEMORY_ONLY"
+      )
 
       lockBinding(sym = "enums", env = sc$state)
     }
