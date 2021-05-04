@@ -13,8 +13,8 @@
 \item{output_location}{Location of the output image. This should be the
 desired path of the image file excluding extension in its file name.}
 
-\item{output_format}{File format of the output image. Currently PNG, GIF, and
-SVG formats are supported (default: PNG).}
+\item{output_format}{File format of the output image. Currently "png",
+"gif", and "svg" formats are supported (default: "png").}
 
 \item{boundary}{Only render data within the given rectangular boundary.
 The `boundary` parameter can be set to either a numeric vector of

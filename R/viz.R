@@ -8,8 +8,8 @@
 #' @param resolution_y Resolution on the y-axis.
 #' @param output_location Location of the output image. This should be the
 #'   desired path of the image file excluding extension in its file name.
-#' @param output_format File format of the output image. Currently PNG, GIF, and
-#'  SVG formats are supported (default: PNG).
+#' @param output_format File format of the output image. Currently "png",
+#'   "gif", and "svg" formats are supported (default: "png").
 #' @param boundary Only render data within the given rectangular boundary.
 #'   The `boundary` parameter can be set to either a numeric vector of
 #'   c(min_x, max_y, min_y, max_y) values, or with a bounding box object
@@ -44,7 +44,7 @@ sedona_render_heatmap <- function(
                                   resolution_x,
                                   resolution_y,
                                   output_location,
-                                  output_format = c("PNG", "GIF", "SVG"),
+                                  output_format = c("png", "gif", "svg"),
                                   boundary = NULL,
                                   blur_radius = 10L,
                                   browse = interactive()) {
@@ -89,7 +89,7 @@ sedona_render_scatter_plot <- function(
                                   resolution_x,
                                   resolution_y,
                                   output_location,
-                                  output_format = c("PNG", "GIF", "SVG"),
+                                  output_format = c("png", "gif", "svg"),
                                   boundary = NULL,
                                   color_of_variation = c("red", "green", "blue"),
                                   base_color = c(0, 0, 0),
@@ -130,7 +130,7 @@ sedona_render_choropleth_map <- function(
                                          resolution_x,
                                          resolution_y,
                                          output_location,
-                                         output_format = c("PNG", "GIF", "SVG"),
+                                         output_format = c("png", "gif", "svg"),
                                          boundary = NULL,
                                          color_of_variation = c("red", "green", "blue"),
                                          base_color = c(0, 0, 0),
@@ -159,7 +159,7 @@ sedona_render_viz_effect <- function(
                                      resolution_x,
                                      resolution_y,
                                      output_location,
-                                     output_format = c("PNG", "GIF", "SVG"),
+                                     output_format = c("png", "gif", "svg"),
                                      boundary = NULL,
                                      color_of_variation = c("red", "green", "blue"),
                                      base_color = c(0, 0, 0),

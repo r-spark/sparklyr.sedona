@@ -32,51 +32,51 @@ spark_dependencies <- function(spark_version, scala_version, ...) {
       )
 
       for (x in c(
-                  "CSV",
-                  "TSV",
-                  "GEOJSON",
-                  "WKT",
-                  "WKB",
-                  "COMMA",
-                  "TAB",
-                  "QUESTIONMARK",
-                  "SINGLEQUOTE",
-                  "QUOTE",
-                  "UNDERSCORE",
-                  "DASH",
-                  "PERCENT",
-                  "TILDE",
-                  "PIPE",
-                  "SEMICOLON")) {
+                  "csv",
+                  "tsv",
+                  "geojson",
+                  "wkt",
+                  "wkb",
+                  "comma",
+                  "tab",
+                  "questionmark",
+                  "singlequote",
+                  "quote",
+                  "underscore",
+                  "dash",
+                  "percent",
+                  "tilde",
+                  "pipe",
+                  "semicolon")) {
         sc$state$enums$delimiter[[x]] <- invoke_static(
-          sc, "org.apache.sedona.core.enums.FileDataSplitter", x
+          sc, "org.apache.sedona.core.enums.FileDataSplitter", toupper(x)
         )
       }
       for (x in c(
-                  "POINT",
-                  "POLYGON",
-                  "LINESTRING",
-                  "MULTIPOINT",
-                  "MULTIPOLYGON",
-                  "MULTILINESTRING",
-                  "GEOMETRYCOLLECTION",
-                  "CIRCLE",
-                  "RECTANGLE")) {
+                  "point",
+                  "polygon",
+                  "linestring",
+                  "multipoint",
+                  "multipolygon",
+                  "multilinestring",
+                  "geometrycollection",
+                  "circle",
+                  "rectangle")) {
         sc$state$enums$geometry_type[[x]] <- invoke_static(
-          sc, "org.apache.sedona.core.enums.GeometryType", x
+          sc, "org.apache.sedona.core.enums.GeometryType", toupper(x)
         )
       }
       sc$state$object_cache$storage_levels$memory_only <- invoke_static(
         sc, "org.apache.spark.storage.StorageLevel", "MEMORY_ONLY"
       )
-      for (image_type in c("PNG", "GIF", "SVG")) {
-        sc$state$object_cache$image_types[[image_type]] <- invoke_static(
-          sc, "org.apache.sedona.viz.utils.ImageType", image_type
+      for (x in c("png", "gif", "svg")) {
+        sc$state$object_cache$image_types[[x]] <- invoke_static(
+          sc, "org.apache.sedona.viz.utils.ImageType", toupper(x)
         )
       }
-      for (color in c("red", "green", "blue")) {
-        sc$state$object_cache$awt_color[[color]] <- invoke_static(
-          sc, "java.awt.Color", toupper(color)
+      for (x in c("red", "green", "blue")) {
+        sc$state$object_cache$awt_color[[x]] <- invoke_static(
+          sc, "java.awt.Color", toupper(x)
         )
       }
 
