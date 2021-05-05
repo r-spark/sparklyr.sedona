@@ -31,6 +31,8 @@ spark_dependencies <- function(spark_version, scala_version, ...) {
         spark_session(sc)
       )
 
+      # Instantiate all enum objects and store them immutably under
+      # sc$state$enums
       for (x in c(
                   "csv",
                   "tsv",
@@ -71,6 +73,11 @@ spark_dependencies <- function(spark_version, scala_version, ...) {
           sc, "org.apache.sedona.core.enums.IndexType", toupper(x)
         )
       }
+      for (x in c("quadtree", "kdbtree")) {
+        sc$state$enums$grid_type[[x]] <- invoke_static(
+          sc, "org.apache.sedona.core.enums.GridType", toupper(x)
+        )
+      }
       for (x in c("png", "gif", "svg")) {
         sc$state$enums$image_types[[x]] <- invoke_static(
           sc, "org.apache.sedona.viz.utils.ImageType", toupper(x)
@@ -81,11 +88,13 @@ spark_dependencies <- function(spark_version, scala_version, ...) {
           sc, "java.awt.Color", toupper(x)
         )
       }
+      lockBinding(sym = "enums", env = sc$state)
+
+      # Other JVM objects that can be cached and evicted are stored mutably
+      # under sc$state$object_cache
       sc$state$object_cache$storage_levels$memory_only <- invoke_static(
         sc, "org.apache.spark.storage.StorageLevel", "MEMORY_ONLY"
       )
-
-      lockBinding(sym = "enums", env = sc$state)
     }
   )
 }
