@@ -149,15 +149,12 @@ sedona_read_geojson_to_typed_rdd <- function(
                                              has_non_spatial_attrs = TRUE,
                                              storage_level = "MEMORY_ONLY",
                                              repartition = 1L) {
-  rdd_cls <- rdd_cls_from_type(type)
-  delimiter <- sc$state$enums$delimiter$GEOJSON
-
   invoke_new(
     sc,
-    rdd_cls,
+    rdd_cls_from_type(type),
     java_context(sc),
     location,
-    delimiter,
+    sc$state$enums$delimiter$geojson,
     has_non_spatial_attrs,
     min(as.integer(repartition %||% 1L), 1L)
   ) %>%
@@ -433,17 +430,17 @@ to_camel_case <- function(type) {
 to_delimiter_enum_value <- function(sc, delimiter) {
   delimiter <- switch(
     delimiter,
-    "," = "CSV",
-    "\t" = "TSV",
-    "?" = "QUESTIONMARK",
-    "'" = "SINGLEQUOTE",
-    "\"" = "QUOTE",
-    "_" = "UNDERSCORE",
-    "-" = "DASH",
-    "%" = "PERCENT",
-    "~" = "TILDE",
-    "|" = "PIPE",
-    ";" = "SEMICOLON",
+    "," = "csv",
+    "\t" = "tsv",
+    "?" = "questionmark",
+    "'" = "singlequote",
+    "\"" = "quote",
+    "_" = "underscore",
+    "-" = "dash",
+    "%" = "percent",
+    "~" = "tilde",
+    "|" = "pipe",
+    ";" = "semicolon",
     stop("Unsupported delimiter '", delimiter, "'")
   )
 

@@ -8,7 +8,7 @@ test_rdd_with_non_spatial_attrs <- invoke_new(
   java_context(sc),
   test_data("arealm-small.csv"),
   1L, # offset
-  sc$state$enums$delimiter$CSV,
+  sc$state$enums$delimiter$csv,
   TRUE,
   1L, # numPartitions
   sc$state$object_cache$storage_levels$memory_only
@@ -260,7 +260,7 @@ test_that("sedona_write_wkb() works as expected", {
     java_context(sc),
     output_location,
     0L, # offset
-    sc$state$enums$delimiter$WKB,
+    sc$state$enums$delimiter$wkb,
     TRUE,
     1L, # numPartitions
     sc$state$object_cache$storage_levels$memory_only
@@ -278,7 +278,7 @@ test_that("sedona_write_wkt() works as expected", {
     java_context(sc),
     output_location,
     0L, # offset
-    sc$state$enums$delimiter$WKT,
+    sc$state$enums$delimiter$wkt,
     TRUE,
     1L, # numPartitions
     sc$state$object_cache$storage_levels$memory_only
@@ -296,7 +296,7 @@ test_that("sedona_write_geojson() works as expected", {
     java_context(sc),
     output_location,
     0L, # offset
-    sc$state$enums$delimiter$GEOJSON,
+    sc$state$enums$delimiter$geojson,
     TRUE,
     1L, # numPartitions
     sc$state$object_cache$storage_levels$memory_only

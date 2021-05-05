@@ -9,7 +9,7 @@ sedona_render_choropleth_map(
   resolution_x,
   resolution_y,
   output_location,
-  output_format = c("PNG", "GIF", "SVG"),
+  output_format = c("png", "gif", "svg"),
   boundary = NULL,
   color_of_variation = c("red", "green", "blue"),
   base_color = c(0, 0, 0),
@@ -29,8 +29,8 @@ java.lang.Long being values.}
 \item{output_location}{Location of the output image. This should be the
 desired path of the image file excluding extension in its file name.}
 
-\item{output_format}{File format of the output image. Currently PNG, GIF, and
-SVG formats are supported (default: PNG).}
+\item{output_format}{File format of the output image. Currently "png",
+"gif", and "svg" formats are supported (default: "png").}
 
 \item{boundary}{Only render data within the given rectangular boundary.
 The `boundary` parameter can be set to either a numeric vector of
