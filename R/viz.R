@@ -244,7 +244,7 @@ gen_raster_image <- function(
       append(
         list(
           255L, # gamma
-          sc$state$object_cache$awt_color[[color_settings$color_of_variation]],
+          sc$state$enums$awt_color[[color_settings$color_of_variation]],
           color_settings$shade
         )
       )
@@ -256,6 +256,6 @@ gen_raster_image <- function(
     "SaveRasterImageAsLocalFile",
     invoke(viz_op, "rasterImage"),
     output_location,
-    sc$state$object_cache$image_types[[output_format]]
+    sc$state$enums$image_types[[output_format]]
   )
 }
