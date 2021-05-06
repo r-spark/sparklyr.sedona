@@ -1,8 +1,8 @@
 context("build index")
 
-test_that("sedona_build_index() works as expected", {
-  sc <- testthat_spark_connection()
+sc <- testthat_spark_connection()
 
+test_that("sedona_build_index() works as expected on raw partitions", {
   pt_rdd <- sedona_read_dsv_to_typed_rdd(
     sc,
     location = test_data("arealm.csv"),
@@ -17,6 +17,7 @@ test_that("sedona_build_index() works as expected", {
       invoke("%>%", list("first"), list("getClass"), list("getName")),
     "org.locationtech.jts.index.quadtree.Quadtree"
   )
+  expect_equal(pt_rdd$.state$raw_partitions_index_type, "quadtree")
 
   sedona_build_index(pt_rdd, type = "rtree")
   indexed_raw_rdd <- invoke(pt_rdd$.jobj, "indexedRawRDD")
@@ -26,4 +27,24 @@ test_that("sedona_build_index() works as expected", {
       invoke("%>%", list("first"), list("getClass"), list("getName")),
     "org.locationtech.jts.index.strtree.STRtree"
   )
+  expect_equal(pt_rdd$.state$raw_partitions_index_type, "rtree")
+})
+
+test_that("sedona_build_index() works as expected on spatial partitions", {
+  pt_rdd <- sedona_read_dsv_to_typed_rdd(
+    sc,
+    location = test_data("arealm.csv"),
+    type = "point",
+    repartition = 5
+  )
+  sedona_apply_spatial_partition(pt_rdd, partitioner = "quadtree")
+  sedona_build_index(pt_rdd, type = "rtree")
+  indexed_rdd <- invoke(pt_rdd$.jobj, "indexedRDD")
+
+  expect_equal(
+    indexed_rdd %>%
+      invoke("%>%", list("first"), list("getClass"), list("getName")),
+    "org.locationtech.jts.index.strtree.STRtree"
+  )
+  expect_equal(pt_rdd$.state$spatial_partitions_index_type, "rtree")
 })

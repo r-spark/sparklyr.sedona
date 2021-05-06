@@ -63,5 +63,8 @@ approx_count <- function(x) {
 }
 
 make_spatial_rdd <- function(jobj, type, ...) {
-  structure(list(.jobj = jobj), class = paste0(c(type, "spatial"), "_rdd"))
+  structure(
+    list(.jobj = jobj, .state = new.env(parent = emptyenv())),
+    class = paste0(c(type, "spatial"), "_rdd")
+  )
 }
