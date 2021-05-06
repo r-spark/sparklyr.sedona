@@ -49,6 +49,7 @@ apply_spatial_partition_impl.character <- function(
     list(rdd$.jobj, "spatialPartitioning", grid_type) %>%
       append(as.integer(max_levels))
   )
+  rdd$.state$has_spatial_partitioning <- TRUE
 }
 
 apply_spatial_partition_impl.spark_jobj <- function(
@@ -60,6 +61,7 @@ apply_spatial_partition_impl.spark_jobj <- function(
   }
 
   invoke(rdd$.jobj, "spatialPartitioning", partitioner)
+  rdd$.state$has_spatial_partitioning <- TRUE
 }
 
 apply_spatial_partition_impl.default <- function(
