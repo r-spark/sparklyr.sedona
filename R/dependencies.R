@@ -95,7 +95,20 @@ spark_dependencies <- function(spark_version, scala_version, ...) {
       sc$state$object_cache$storage_levels$memory_only <- invoke_static(
         sc, "org.apache.spark.storage.StorageLevel", "MEMORY_ONLY"
       )
-    }
+    },
+    dbplyr_sql_variant = list(
+      scalar = list(
+        ST_Point = function(x, y) {
+          dbplyr::build_sql(
+            "ST_Point(CAST(",
+            x,
+            " AS DECIMAL(24, 20)), CAST(",
+            y,
+            " AS DECIMAL(24, 20)))"
+          )
+        }
+      )
+    )
   )
 }
 
