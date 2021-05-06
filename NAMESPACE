@@ -3,6 +3,7 @@
 export(approx_count)
 export(minimum_bounding_box)
 export(new_bounding_box)
+export(sedona_apply_spatial_partition)
 export(sedona_build_index)
 export(sedona_read_dsv_to_typed_rdd)
 export(sedona_read_geojson)

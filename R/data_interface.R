@@ -102,7 +102,7 @@ sedona_read_dsv_to_typed_rdd <- function(
     rdd_cls,
     java_context(sc),
     location,
-    min(as.integer(repartition %||% 1L), 1L),
+    max(as.integer(repartition %||% 1L), 1L),
     fmt
   ) %>%
     set_storage_level(storage_level) %>%
@@ -156,7 +156,7 @@ sedona_read_geojson_to_typed_rdd <- function(
     location,
     sc$state$enums$delimiter$geojson,
     has_non_spatial_attrs,
-    min(as.integer(repartition %||% 1L), 1L)
+    max(as.integer(repartition %||% 1L), 1L)
   ) %>%
     set_storage_level(storage_level) %>%
     make_spatial_rdd(type)
@@ -186,7 +186,7 @@ sedona_read_geojson <- function(
     java_context(sc),
     "textFile",
     location,
-    min(as.integer(repartition %||% 1L), 1L)
+    max(as.integer(repartition %||% 1L), 1L)
   )
   invoke_static(
     sc,
@@ -228,7 +228,7 @@ sedona_read_wkb <- function(
     java_context(sc),
     "textFile",
     location,
-    min(as.integer(repartition %||% 1L), 1L)
+    max(as.integer(repartition %||% 1L), 1L)
   )
 
   invoke_static(
@@ -271,7 +271,7 @@ sedona_read_wkt <- function(
     java_context(sc),
     "textFile",
     location,
-    min(as.integer(repartition %||% 1L), 1L)
+    max(as.integer(repartition %||% 1L), 1L)
   )
 
   invoke_static(
