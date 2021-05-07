@@ -23,79 +23,164 @@ spark_dependencies <- function(spark_version, scala_version, ...) {
         "org.wololo:jts2geojson:0.14.3"
       )
     ),
-    initializer = function(sc) {
-      invoke_static(
-        sc,
-        "org.apache.sedona.sql.utils.SedonaSQLRegistrator",
-        "registerAll",
-        spark_session(sc)
-      )
+    initializer = sedona_initialize_spark_connection,
+    dbplyr_sql_variant = sedona_dbplyr_sql_variant()
+  )
+}
 
-      # Instantiate all enum objects and store them immutably under
-      # sc$state$enums
-      for (x in c(
-                  "csv",
-                  "tsv",
-                  "geojson",
-                  "wkt",
-                  "wkb",
-                  "comma",
-                  "tab",
-                  "questionmark",
-                  "singlequote",
-                  "quote",
-                  "underscore",
-                  "dash",
-                  "percent",
-                  "tilde",
-                  "pipe",
-                  "semicolon")) {
-        sc$state$enums$delimiter[[x]] <- invoke_static(
-          sc, "org.apache.sedona.core.enums.FileDataSplitter", toupper(x)
-        )
-      }
-      for (x in c(
-                  "point",
-                  "polygon",
-                  "linestring",
-                  "multipoint",
-                  "multipolygon",
-                  "multilinestring",
-                  "geometrycollection",
-                  "circle",
-                  "rectangle")) {
-        sc$state$enums$geometry_type[[x]] <- invoke_static(
-          sc, "org.apache.sedona.core.enums.GeometryType", toupper(x)
-        )
-      }
-      for (x in c("quadtree", "rtree")) {
-        sc$state$enums$index_type[[x]] <- invoke_static(
-          sc, "org.apache.sedona.core.enums.IndexType", toupper(x)
-        )
-      }
-      for (x in c("quadtree", "kdbtree")) {
-        sc$state$enums$grid_type[[x]] <- invoke_static(
-          sc, "org.apache.sedona.core.enums.GridType", toupper(x)
-        )
-      }
-      for (x in c("png", "gif", "svg")) {
-        sc$state$enums$image_types[[x]] <- invoke_static(
-          sc, "org.apache.sedona.viz.utils.ImageType", toupper(x)
-        )
-      }
-      for (x in c("red", "green", "blue")) {
-        sc$state$enums$awt_color[[x]] <- invoke_static(
-          sc, "java.awt.Color", toupper(x)
-        )
-      }
-      lockBinding(sym = "enums", env = sc$state)
+sedona_initialize_spark_connection <- function(sc) {
+  invoke_static(
+    sc,
+    "org.apache.sedona.sql.utils.SedonaSQLRegistrator",
+    "registerAll",
+    spark_session(sc)
+  )
 
-      # Other JVM objects that can be cached and evicted are stored mutably
-      # under sc$state$object_cache
-      sc$state$object_cache$storage_levels$memory_only <- invoke_static(
-        sc, "org.apache.spark.storage.StorageLevel", "MEMORY_ONLY"
-      )
-    }
+  # Instantiate all enum objects and store them immutably under
+  # sc$state$enums
+  for (x in c(
+              "csv",
+              "tsv",
+              "geojson",
+              "wkt",
+              "wkb",
+              "comma",
+              "tab",
+              "questionmark",
+              "singlequote",
+              "quote",
+              "underscore",
+              "dash",
+              "percent",
+              "tilde",
+              "pipe",
+              "semicolon")) {
+    sc$state$enums$delimiter[[x]] <- invoke_static(
+      sc, "org.apache.sedona.core.enums.FileDataSplitter", toupper(x)
+    )
+  }
+  for (x in c(
+              "point",
+              "polygon",
+              "linestring",
+              "multipoint",
+              "multipolygon",
+              "multilinestring",
+              "geometrycollection",
+              "circle",
+              "rectangle")) {
+    sc$state$enums$geometry_type[[x]] <- invoke_static(
+      sc, "org.apache.sedona.core.enums.GeometryType", toupper(x)
+    )
+  }
+  for (x in c("quadtree", "rtree")) {
+    sc$state$enums$index_type[[x]] <- invoke_static(
+      sc, "org.apache.sedona.core.enums.IndexType", toupper(x)
+    )
+  }
+  for (x in c("quadtree", "kdbtree")) {
+    sc$state$enums$grid_type[[x]] <- invoke_static(
+      sc, "org.apache.sedona.core.enums.GridType", toupper(x)
+    )
+  }
+  for (x in c("png", "gif", "svg")) {
+    sc$state$enums$image_types[[x]] <- invoke_static(
+      sc, "org.apache.sedona.viz.utils.ImageType", toupper(x)
+    )
+  }
+  for (x in c("red", "green", "blue")) {
+    sc$state$enums$awt_color[[x]] <- invoke_static(
+      sc, "java.awt.Color", toupper(x)
+    )
+  }
+  lockBinding(sym = "enums", env = sc$state)
+
+  # Other JVM objects that can be cached and evicted are stored mutably
+  # under sc$state$object_cache
+  sc$state$object_cache$storage_levels$memory_only <- invoke_static(
+    sc, "org.apache.spark.storage.StorageLevel", "MEMORY_ONLY"
+  )
+}
+
+sedona_dbplyr_sql_variant <- function() {
+  list(
+    scalar = list(
+      ST_Point = function(x, y) {
+        dbplyr::build_sql(
+          "ST_Point(CAST(",
+          x,
+          " AS DECIMAL(24, 20)), CAST(",
+          y,
+          " AS DECIMAL(24, 20)))"
+        )
+      },
+      ST_PolygonFromEnvelope = function(min_x, min_y, max_x, max_y) {
+        dbplyr::build_sql(
+          "ST_PolygonFromEnvelope(CAST(",
+          min_x,
+          " AS DECIMAL(24, 20)), CAST(",
+          min_y,
+          " AS DECIMAL(24, 20)), CAST(",
+          max_x,
+          " AS DECIMAL(24, 20)), CAST(",
+          max_y,
+          " AS DECIMAL(24, 20)))"
+        )
+      },
+      ST_Buffer = function(geometry, buffer) {
+        dbplyr::build_sql(
+          "ST_Buffer(", geometry, ", CAST(", buffer, " AS DOUBLE))"
+        )
+      },
+      ST_PrecisionReduce = function(geometry, precision) {
+        dbplyr::build_sql(
+          "ST_PrecisionReduce(", geometry, ", CAST(", precision, " AS INTEGER))"
+        )
+      },
+      ST_SimplifyPreserveTopology = function(geometry, distance_tolerance) {
+        dbplyr::build_sql(
+          "ST_SimplifyPreserveTopology(",
+          geometry,
+          ", CAST(",
+          distance_tolerance,
+          " AS DOUBLE))"
+        )
+      },
+      ST_GeometryN = function(geometry, n) {
+        dbplyr::build_sql(
+          "ST_GeometryN(", geometry, ", CAST(", n, " AS INTEGER))"
+        )
+      },
+      ST_InteriorRingN = function(geometry, n) {
+        dbplyr::build_sql(
+          "ST_InteriorRingN(", geometry, ", CAST(", n, " AS INTEGER))"
+        )
+      },
+      ST_AddPoint = function(geometry, point, position = NULL) {
+        if (is.null(position)) {
+          dbplyr::build_sql("ST_AddPoint(", geometry, ", ", point, ")")
+        } else {
+          dbplyr::build_sql(
+            "ST_AddPoint(",
+            geometry,
+            ", ",
+            point,
+            ", CAST(",
+            position,
+            " AS INTEGER))"
+          )
+        }
+      },
+      ST_RemovePoint = function(geometry, position = NULL) {
+        if (is.null(position)) {
+          dbplyr::build_sql("ST_RemovePoint(", geometry, ")")
+        } else {
+          dbplyr::build_sql(
+            "ST_RemovePoint(", geometry, ", CAST(", position, " AS INTEGER))"
+          )
+        }
+      }
+    )
   )
 }
 
