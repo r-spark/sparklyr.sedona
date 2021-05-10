@@ -66,3 +66,16 @@ expect_geom_equal <- function(sc, lhs, rhs) {
     )
   }
 }
+
+expect_coordinates_equal <- function(geometry, coords) {
+  expect_equal(
+    geometry %>%
+      invoke("getCoordinates") %>%
+      lapply(
+        function(pt) {
+          c(pt %>% invoke("getX"), pt %>% invoke("getY"))
+        }
+      ),
+    coords
+  )
+}
