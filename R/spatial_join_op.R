@@ -64,7 +64,7 @@ sedona_spatial_join <- function(
     !is.null(index_type),
     identical(join_type, "intersect")
   ) %>%
-    make_spatial_rdd(type = "pair")
+    new_spatial_rdd(type = "pair")
 }
 
 #' Perform a spatial count-by-key operation based on two Sedona spatial RDDs.
@@ -102,7 +102,7 @@ sedona_spatial_join_count_by_key <- function(
     !is.null(index_type),
     identical(join_type, "intersect")
   ) %>%
-    make_spatial_rdd(type = "count_by_key")
+    new_spatial_rdd(type = "count_by_key")
 }
 
 ensure_consistent_spatial_partitioning <- function(

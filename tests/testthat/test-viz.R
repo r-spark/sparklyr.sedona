@@ -85,7 +85,7 @@ test_that("sedona_render_choropleth_map() works as expected", {
     TRUE,
     TRUE
   ) %>%
-    sparklyr.sedona:::make_spatial_rdd("pair_rdd")
+    sparklyr.sedona:::new_spatial_rdd("pair_rdd")
 
   sedona_render_choropleth_map(
     pair_rdd,
@@ -94,6 +94,49 @@ test_that("sedona_render_choropleth_map() works as expected", {
     output_location = tempfile("scatter-plot-"),
     boundary = c(-126.790180, -64.630926, 24.863836, 50.000),
     base_color = c(255, 255, 255)
+  )
+
+  succeed()
+})
+
+test_that("overlay operator works as expected", {
+  resolution_x <- 1000
+  resolution_y <- 600
+  boundary <- c(-126.790180, -64.630926, 24.863836, 50.000)
+
+  pt_rdd <- sedona_read_dsv_to_typed_rdd(
+    sc,
+    location = test_data("arealm.csv"),
+    type = "point"
+  )
+  polygon_rdd <- sedona_read_dsv_to_typed_rdd(
+    sc,
+    location = test_data("primaryroads-polygon.csv"),
+    type = "polygon"
+  )
+  pair_rdd <- sedona_spatial_join_count_by_key(
+    pt_rdd,
+    polygon_rdd,
+    join_type = "intersect"
+  )
+  overlay <- sedona_render_scatter_plot(
+    polygon_rdd,
+    resolution_x,
+    resolution_y,
+    output_location = tempfile("scatter-plot-"),
+    boundary = boundary,
+    base_color = c(255, 0, 0),
+    browse = FALSE
+  )
+
+  sedona_render_choropleth_map(
+    pair_rdd,
+    resolution_x,
+    resolution_y,
+    output_location = tempfile("choropleth-map-"),
+    boundary = boundary,
+    base_color = c(255, 0, 0),
+    overlay = overlay
   )
 
   succeed()

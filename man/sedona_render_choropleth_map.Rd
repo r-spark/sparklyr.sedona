@@ -15,6 +15,7 @@ sedona_render_choropleth_map(
   base_color = c(0, 0, 0),
   shade = TRUE,
   reverse_coords = FALSE,
+  overlay = NULL,
   browse = interactive()
 )
 }
@@ -51,6 +52,9 @@ darker color. Default: TRUE.}
 
 \item{reverse_coords}{Whether to reverse spatial coordinates in the plot
 (default: FALSE).}
+
+\item{overlay}{A \code{viz_op} object containing a raster image to be
+displayed on top of the resulting image.}
 
 \item{browse}{Whether to open the rendered image in a browser (default:
 interactive()).}

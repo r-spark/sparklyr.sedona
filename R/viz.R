@@ -16,8 +16,6 @@
 #'   e.g., new_bounding_box(sc, min_x, max_y, min_y, max_y), or NULL
 #'   (the default). If `boundary` is NULL, then the minimum bounding box of the
 #'   input spatial RDD will be computed and used as boundary for rendering.
-#' @param browse Whether to open the rendered image in a browser (default:
-#'   interactive()).
 #' @param color_of_variation Which color channel will vary depending on values
 #'   of data points. Must be one of "red", "green", or "blue". Default: red.
 #' @param base_color Color of any data point with value 0. Must be a numeric
@@ -25,6 +23,10 @@
 #'   Default: c(0, 0, 0).
 #' @param shade Whether data point with larger magnitude will be displayed with
 #'   darker color. Default: TRUE.
+#' @param overlay A \code{viz_op} object containing a raster image to be
+#'   displayed on top of the resulting image.
+#' @param browse Whether to open the rendered image in a browser (default:
+#'   interactive()).
 #'
 #' @name sedona_visualization_routines
 NULL
@@ -47,6 +49,7 @@ sedona_render_heatmap <- function(
                                   output_format = c("png", "gif", "svg"),
                                   boundary = NULL,
                                   blur_radius = 10L,
+                                  overlay = NULL,
                                   browse = interactive()) {
   sc <- spark_connection(rdd$.jobj)
   output_format <- match.arg(output_format)
@@ -65,13 +68,14 @@ sedona_render_heatmap <- function(
   rdd %>% gen_raster_image(
     viz_op = viz_op,
     output_location = output_location,
-    output_format = output_format
+    output_format = output_format,
+    overlay = overlay
   )
   if (browse) {
     browseURL(paste0(output_location, ".", tolower(output_format)))
   }
 
-  invisible(NULL)
+  invisible(viz_op %>% new_viz_op("heatmap"))
 }
 
 #' Visualize a Sedona spatial RDD using a scatter plot.
@@ -95,8 +99,9 @@ sedona_render_scatter_plot <- function(
                                   base_color = c(0, 0, 0),
                                   shade = TRUE,
                                   reverse_coords = FALSE,
+                                  overlay = NULL,
                                   browse = interactive()) {
-  sedona_render_viz_effect(
+  viz_op <- sedona_render_viz_effect(
     viz_effect_name = "ScatterPlot",
     rdd = rdd,
     resolution_x = resolution_x,
@@ -108,8 +113,11 @@ sedona_render_scatter_plot <- function(
     base_color = base_color,
     shade = shade,
     reverse_coords = reverse_coords,
+    overlay = overlay,
     browse = browse
   )
+
+  invisible(viz_op %>% new_viz_op("scatter_plot"))
 }
 
 #' Visualize a Sedona spatial RDD using a choropleth map.
@@ -136,8 +144,9 @@ sedona_render_choropleth_map <- function(
                                          base_color = c(0, 0, 0),
                                          shade = TRUE,
                                          reverse_coords = FALSE,
+                                         overlay = NULL,
                                          browse = interactive()) {
-  sedona_render_viz_effect(
+  viz_op <- sedona_render_viz_effect(
     viz_effect_name = "ChoroplethMap",
     rdd = pair_rdd,
     resolution_x = resolution_x,
@@ -149,8 +158,11 @@ sedona_render_choropleth_map <- function(
     base_color = base_color,
     shade = shade,
     reverse_coords = reverse_coords,
+    overlay = overlay,
     browse = browse
   )
+
+  invisible(viz_op %>% new_viz_op("choropleth_map"))
 }
 
 sedona_render_viz_effect <- function(
@@ -165,6 +177,7 @@ sedona_render_viz_effect <- function(
                                      base_color = c(0, 0, 0),
                                      shade = shade,
                                      reverse_coords = FALSE,
+                                     overlay = NULL,
                                      browse = interactive()) {
   sc <- spark_connection(rdd$.jobj)
   output_format <- match.arg(output_format)
@@ -190,13 +203,14 @@ sedona_render_viz_effect <- function(
         color_of_variation = color_of_variation,
         base_color = base_color,
         shade = shade
-      )
+      ),
+      overlay = overlay
     )
   if (browse) {
     browseURL(paste0(output_location, ".", tolower(output_format)))
   }
 
-  invisible(NULL)
+  invisible(viz_op)
 }
 
 validate_base_color <- function(base_color) {
@@ -231,7 +245,8 @@ gen_raster_image <- function(
                              viz_op,
                              output_location,
                              output_format,
-                             color_settings = NULL) {
+                             color_settings = NULL,
+                             overlay = NULL) {
   sc <- spark_connection(rdd$.jobj)
 
   image_generator <- invoke_new(
@@ -251,11 +266,34 @@ gen_raster_image <- function(
     do.call(invoke, customize_color_params)
   }
   invoke(viz_op, "Visualize", java_context(sc), rdd$.jobj)
+
   invoke(
     image_generator,
     "SaveRasterImageAsLocalFile",
-    invoke(viz_op, "rasterImage"),
+    viz_op %>% process_overlay(overlay),
     output_location,
     sc$state$enums$image_types[[output_format]]
   )
+}
+
+process_overlay <- function(viz_op, overlay) {
+  if (!is.null(overlay)) {
+    sc <- spark_connection(viz_op)
+
+    viz_op_img <- invoke(viz_op, "rasterImage")
+    overlay_op <- invoke_new(
+      sc,
+      "org.apache.sedona.viz.core.RasterOverlayOperator",
+      viz_op_img
+    )
+    overlay_img <- invoke(overlay$.jobj, "rasterImage")
+    invoke(overlay_op, "JoinImage", overlay_img)
+    invoke(overlay_op, "backRasterImage")
+  } else {
+    invoke(viz_op, "rasterImage")
+  }
+}
+
+new_viz_op <- function(jobj, type = NULL) {
+  structure(list(.jobj = jobj, class = c(type, "viz_op")))
 }
