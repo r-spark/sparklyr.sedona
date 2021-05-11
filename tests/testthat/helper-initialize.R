@@ -76,15 +76,26 @@ expect_geom_equal <- function(sc, lhs, rhs) {
   }
 }
 
+as.coordinate_list <- function(geometry) {
+  geometry %>%
+    invoke("getCoordinates") %>%
+    lapply(function(pt) c(pt %>% invoke("getX"), pt %>% invoke("getY")))
+}
+
 expect_coordinates_equal <- function(geometry, coords) {
-  expect_equal(
-    geometry %>%
-      invoke("getCoordinates") %>%
+  expect_equal(as.coordinate_list(geometry), coords)
+}
+
+expect_coordinate_lists_setequal <- function(geometries, coords_list) {
+  expect_setequal(
+    geometries %>%
       lapply(
-        function(pt) {
-          c(pt %>% invoke("getX"), pt %>% invoke("getY"))
+        function(geometry) {
+          geometry %>%
+            invoke("getCoordinates") %>%
+            lapply(function(pt) list(pt %>% invoke("getX"), pt %>% invoke("getY")))
         }
       ),
-    coords
+    coords_list
   )
 }
