@@ -26,9 +26,6 @@ README_cache
 # Perf.md cache
 perf_cache
 spark-warehouse
-# Ignore everything under docs except for docs/reference
-docs/*
-!docs/reference
 \.DS_Store
 demo\.R
 # Spark log
