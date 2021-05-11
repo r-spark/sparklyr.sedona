@@ -12,6 +12,7 @@ sedona_render_heatmap(
   output_format = c("png", "gif", "svg"),
   boundary = NULL,
   blur_radius = 10L,
+  overlay = NULL,
   browse = interactive()
 )
 }
@@ -37,6 +38,9 @@ input spatial RDD will be computed and used as boundary for rendering.}
 
 \item{blur_radius}{Controls the radius of a Gaussian blur in the resulting
 heatmap.}
+
+\item{overlay}{A \code{viz_op} object containing a raster image to be
+displayed on top of the resulting image.}
 
 \item{browse}{Whether to open the rendered image in a browser (default:
 interactive()).}

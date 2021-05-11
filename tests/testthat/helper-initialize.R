@@ -40,6 +40,15 @@ test_data <- function(file_name) {
   file.path(normalizePath(getwd()), "data", file_name)
 }
 
+read_polygon_rdd <- function() {
+  polygon_rdd <- sedona_read_dsv_to_typed_rdd(
+    testthat_spark_connection(),
+    location = test_data("primaryroads-polygon.csv"),
+    delimiter = ",",
+    type = "polygon"
+  )
+}
+
 expect_boundary_envelope <- function(rdd, expected) {
   actual <- lapply(
     paste0("get", c("MinX", "MaxX", "MinY", "MaxY")),
