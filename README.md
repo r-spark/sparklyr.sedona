@@ -15,7 +15,7 @@ Sparklyr.sedona, built on top of sparklyr, presents what Apache Sedona has to of
 To ensure Sedona serialization routines, UDTs, and UDFs are properly registered when creating a Spark session, one simply needs to attach `sparklyr.sedona` before
 instantiating a Spark conneciton. Sparklyr.sedona will take care of the rest. For example,
 
-```
+``` r
 library(sparklyr)
 library(sparklyr.sedona)
 
@@ -25,7 +25,7 @@ sc <- spark_connect(master = "yarn", spark_home = spark_home)
 
 will create a Sedona-capable Spark connection in YARN client mode, and
 
-```
+``` r
 library(sparklyr)
 library(sparklyr.sedona)
 
@@ -36,7 +36,7 @@ will create a Sedona-capable Spark connection to an Apache Spark instance runnin
 
 In `sparklyr`, one can easily inspect the Spark connection object to sanity-check it has been properly initialized with all Sedona-related dependencies, e.g.,
 
-```
+``` r
 print(sc$extensions$packages)
 ```
 
@@ -52,7 +52,7 @@ print(sc$extensions$packages)
 
 and
 
-```
+``` r
 spark_session(sc) %>%
   invoke("%>%", list("conf"), list("get", "spark.kryo.registrator")) %>%
   print()
@@ -83,7 +83,7 @@ Spark SQL query.
 
 For example, the following code will import data from [arealm-small.csv](https://github.com/apache/incubator-sedona/blob/master/binder/data/arealm-small.csv) into a `SpatialRDD`:
 
-```
+``` r
 pt_rdd <- sedona_read_dsv_to_typed_rdd(
   sc,
   location = "arealm-small.csv",
@@ -113,7 +113,7 @@ See `?sparklyr.sedona::sedona_read_wkt`, `?sparklyr.sedona::sedona_read_wkb`, an
 
 One can also run `to_spatial_rdd()` to extract a SpatailRDD from a Spark SQL query, e.g.,
 
-```
+``` r
 library(sparklyr)
 library(sparklyr.sedona)
 library(dplyr)
@@ -143,10 +143,10 @@ will extract a spatial column named `"geom"` from the Sedona spatial SQL query a
 ## Working with Spark dataframes
 
 As mentioned previously, data from `SpatialRDD` can be exported into a Spark dataframe and be queried and modified through
-the `dplyr` interface of `sparklyr`. The example below does exactly that using `sdf_register()`, a S3 generic that converts
-a lower-level JVM object into a Spark dataframe object in `sparklyr`.
+the `dplyr` interface of `sparklyr`. The example below shows how `sdf_register()`, a S3 generic that converts a lower-level
+object into a Spark dataframe object in `sparklyr`, can be applied to a `SpatialRDD` object created by `sparklyr.sedona`.
 
-```
+``` r
 library(sparklyr)
 library(sparklyr.sedona)
 
@@ -171,7 +171,7 @@ The Spark dataframe object can then be modified using `dplyr` verbs familiar to 
 supported by Sedona can inter-operate seamlessly with other functions supported in `sparklyr`'s dbplyr SQL translation
 env. For example, the code below finds the average area of all polygons in `polygon_sdf`:
 
-```
+``` r
 mean_area_sdf <- polygon_sdf %>%
   dplyr::summarize(dplyr::summarize(mean_area = mean(ST_Area(geometry))))
 print(mean_area_sdf)
@@ -187,8 +187,77 @@ print(mean_area_sdf)
 Once spatial objects are imported into Spark dataframes, they can also be easily integrated with other non-spatial attributes,
 e.g.,
 
-```
+``` r
 modified_polygon_sdf <- polygon_sdf %>%
   dplyr::mutate(type = "polygon")
 ```
 .
+
+Notice all of the above can open up many interesting possiblities. For example, one can extract ML features from geospatial
+data in Spark dataframes, build a ML pipeline using `ml_*` family of functions in `sparklyr` to work with such features, and if
+the output of a ML model happens to be a geospatial object as well, one can even apply visualization routines in
+`sparklyr.sedona` to visualize the difference between any predicted geometry and the corresponding ground truth
+(more on visualization later).
+
+## Visualization
+
+It is worth mentioning `sparklyr.sedona` also implements R interfaces to Sedona visualization routines. For example, the following
+is essentially the R equivalent of [this example in Scala](https://github.com/apache/incubator-sedona/blob/f6b1c5e24bdb67d2c8d701a9b2af1fb5658fdc4d/viz/src/main/scala/org/apache/sedona/viz/showcase/ScalaExample.scala#L142-L160).
+
+``` r
+library(sparklyr)
+library(sparklyr.sedona)
+
+sc <- spark_connect(master = "local")
+
+resolution_x <- 1000
+resolution_y <- 600
+boundary <- c(-126.790180, -64.630926, 24.863836, 50.000)
+
+pt_rdd <- sedona_read_dsv_to_typed_rdd(
+  sc,
+  location = "arealm.csv",
+  type = "point"
+)
+polygon_rdd <- sedona_read_dsv_to_typed_rdd(
+  sc,
+  location = "primaryroads-polygon.csv",
+  type = "polygon"
+)
+pair_rdd <- sedona_spatial_join_count_by_key(
+  pt_rdd,
+  polygon_rdd,
+  join_type = "intersect"
+)
+
+overlay <- sedona_render_scatter_plot(
+  polygon_rdd,
+  resolution_x,
+  resolution_y,
+  output_location = tempfile("scatter-plot-"),
+  boundary = boundary,
+  base_color = c(255, 0, 0),
+  browse = FALSE
+)
+
+sedona_render_choropleth_map(
+  pair_rdd,
+  resolution_x,
+  resolution_y,
+  output_location = "/tmp/choropleth-map",
+  boundary = boundary,
+  overlay = overlay,
+  # vary the green color channel according to relative magnitudes of data points so
+  # that the resulting map will show light blue, light purple, and light gray pixels
+  color_of_variation = "green",
+  base_color = c(225, 225, 255)
+)
+```
+
+It wlll create a scatter plot, and then overlay it on top of a choropleth map, as shown below:
+
+<img src="docs/choropleth-map.png" width=800 />
+
+See `?sparklyr.sedona::sedona_render_scatter_plot`, `?sparklyr.sedona::sedona_render_heatmap`,
+and `?sparklyr.sedona::sedona_render_choropleth_map` for more details on R interfaces of
+Sedona visualization routines currently implemented by `sparklyr.sedona`.
