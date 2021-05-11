@@ -23,9 +23,6 @@ e.g., new_bounding_box(sc, min_x, max_y, min_y, max_y), or NULL
 (the default). If `boundary` is NULL, then the minimum bounding box of the
 input spatial RDD will be computed and used as boundary for rendering.}
 
-\item{browse}{Whether to open the rendered image in a browser (default:
-interactive()).}
-
 \item{color_of_variation}{Which color channel will vary depending on values
 of data points. Must be one of "red", "green", or "blue". Default: red.}
 
@@ -35,6 +32,12 @@ Default: c(0, 0, 0).}
 
 \item{shade}{Whether data point with larger magnitude will be displayed with
 darker color. Default: TRUE.}
+
+\item{overlay}{A \code{viz_op} object containing a raster image to be
+displayed on top of the resulting image.}
+
+\item{browse}{Whether to open the rendered image in a browser (default:
+interactive()).}
 }
 \description{
 Generate a visual representation of geometrical object(s) within a Sedona

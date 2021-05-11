@@ -21,7 +21,7 @@ to_spatial_rdd <- function(x, spatial_col) {
     sdf,
     spatial_col
   ) %>%
-    make_spatial_rdd(NULL)
+    new_spatial_rdd(NULL)
 }
 
 #' Spatial RDD aggregation routine
@@ -62,7 +62,7 @@ approx_count <- function(x) {
     invoke("approximateTotalCount")
 }
 
-make_spatial_rdd <- function(jobj, type, ...) {
+new_spatial_rdd <- function(jobj, type, ...) {
   structure(
     list(.jobj = jobj, .state = new.env(parent = emptyenv())),
     class = paste0(c(type, "spatial"), "_rdd")

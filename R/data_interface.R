@@ -106,7 +106,7 @@ sedona_read_dsv_to_typed_rdd <- function(
     fmt
   ) %>%
     set_storage_level(storage_level) %>%
-    make_spatial_rdd(type)
+    new_spatial_rdd(type)
 }
 
 #' Create a typed SpatialRDD from a shapefile data source.
@@ -130,7 +130,7 @@ sedona_read_shapefile_to_typed_rdd <- function(
     location
   ) %>%
     set_storage_level(storage_level) %>%
-    make_spatial_rdd(type)
+    new_spatial_rdd(type)
 }
 
 #' Create a typed SpatialRDD from a GeoJSON data source.
@@ -159,7 +159,7 @@ sedona_read_geojson_to_typed_rdd <- function(
     max(as.integer(repartition %||% 1L), 1L)
   ) %>%
     set_storage_level(storage_level) %>%
-    make_spatial_rdd(type)
+    new_spatial_rdd(type)
 }
 
 #' Create a SpatialRDD from a GeoJSON data source.
@@ -197,7 +197,7 @@ sedona_read_geojson <- function(
     skip_syntactically_invalid_geometries
   ) %>%
     set_storage_level(storage_level) %>%
-    make_spatial_rdd(NULL)
+    new_spatial_rdd(NULL)
 }
 
 #' Create a SpatialRDD from a Well-Known Binary (WKB) data source.
@@ -241,7 +241,7 @@ sedona_read_wkb <- function(
     skip_syntactically_invalid_geometries
   ) %>%
     set_storage_level(storage_level) %>%
-    make_spatial_rdd(NULL)
+    new_spatial_rdd(NULL)
 }
 
 #' Create a SpatialRDD from a Well-Known Text (WKT) data source.
@@ -284,7 +284,7 @@ sedona_read_wkt <- function(
     skip_syntactically_invalid_geometries
   ) %>%
     set_storage_level(storage_level) %>%
-    make_spatial_rdd(NULL)
+    new_spatial_rdd(NULL)
 }
 
 #' Create a typed SpatialRDD from a shapefile data source.
@@ -309,7 +309,7 @@ sedona_read_shapefile_to_typed_rdd <- function(
     location
   ) %>%
     set_storage_level(storage_level) %>%
-    make_spatial_rdd(type)
+    new_spatial_rdd(type)
 }
 
 #' Create a SpatialRDD from a shapefile data source.
@@ -332,7 +332,7 @@ sedona_read_shapefile <- function(
     location
   ) %>%
     set_storage_level(storage_level) %>%
-    make_spatial_rdd(NULL)
+    new_spatial_rdd(NULL)
 }
 
 #' Write SpatialRDD into a file.
