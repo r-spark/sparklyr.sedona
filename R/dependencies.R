@@ -2,7 +2,7 @@ spark_dependencies <- function(spark_version, scala_version, ...) {
   if (spark_version[1, 1] == "3") {
     spark_version <- "3.0"
     scala_version <- scala_version %||% "2.12"
-  } else if (spark_version[1, 1] == "2" && spark_version[1, 2] == "4" ) {
+  } else if (spark_version[1, 1] == "2" && spark_version[1, 2] == "4") {
     spark_version <- "2.4"
     scala_version <- scala_version %||% "2.11"
   } else {
@@ -39,36 +39,38 @@ sedona_initialize_spark_connection <- function(sc) {
   # Instantiate all enum objects and store them immutably under
   # sc$state$enums
   for (x in c(
-              "csv",
-              "tsv",
-              "geojson",
-              "wkt",
-              "wkb",
-              "comma",
-              "tab",
-              "questionmark",
-              "singlequote",
-              "quote",
-              "underscore",
-              "dash",
-              "percent",
-              "tilde",
-              "pipe",
-              "semicolon")) {
+    "csv",
+    "tsv",
+    "geojson",
+    "wkt",
+    "wkb",
+    "comma",
+    "tab",
+    "questionmark",
+    "singlequote",
+    "quote",
+    "underscore",
+    "dash",
+    "percent",
+    "tilde",
+    "pipe",
+    "semicolon"
+  )) {
     sc$state$enums$delimiter[[x]] <- invoke_static(
       sc, "org.apache.sedona.core.enums.FileDataSplitter", toupper(x)
     )
   }
   for (x in c(
-              "point",
-              "polygon",
-              "linestring",
-              "multipoint",
-              "multipolygon",
-              "multilinestring",
-              "geometrycollection",
-              "circle",
-              "rectangle")) {
+    "point",
+    "polygon",
+    "linestring",
+    "multipoint",
+    "multipolygon",
+    "multilinestring",
+    "geometrycollection",
+    "circle",
+    "rectangle"
+  )) {
     sc$state$enums$geometry_type[[x]] <- invoke_static(
       sc, "org.apache.sedona.core.enums.GeometryType", toupper(x)
     )

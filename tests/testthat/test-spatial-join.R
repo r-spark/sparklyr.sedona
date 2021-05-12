@@ -15,7 +15,8 @@ test_that("sedona_spatial_join() works as expected with 'contain' as join type",
       type = "polygon"
     )
     pair_rdd <- sedona_spatial_join(
-      pt_rdd, polygon_rdd, join_type = "contain", partitioner = partitioner
+      pt_rdd, polygon_rdd,
+      join_type = "contain", partitioner = partitioner
     )
 
     expect_equal(invoke(pair_rdd$.jobj, "count"), 1207)
@@ -36,7 +37,8 @@ test_that("sedona_spatial_join() works as expected with 'contain' as join type",
       type = "polygon"
     )
     pair_rdd <- sedona_spatial_join(
-      pt_rdd, polygon_rdd, join_type = "intersect", partitioner = partitioner
+      pt_rdd, polygon_rdd,
+      join_type = "intersect", partitioner = partitioner
     )
 
     expect_equal(invoke(pair_rdd$.jobj, "count"), 1207)
@@ -57,7 +59,8 @@ test_that("sedona_spatial_join_count_by_key() works as expected with 'contain' a
       type = "polygon"
     )
     pair_rdd <- sedona_spatial_join_count_by_key(
-      pt_rdd, polygon_rdd, join_type = "contain", partitioner = partitioner
+      pt_rdd, polygon_rdd,
+      join_type = "contain", partitioner = partitioner
     )
 
     expect_equal(invoke(pair_rdd$.jobj, "count"), 1207)
@@ -78,7 +81,8 @@ test_that("sedona_spatial_join_count_by_key() works as expected with 'contain' a
       type = "polygon"
     )
     pair_rdd <- sedona_spatial_join_count_by_key(
-      pt_rdd, polygon_rdd, join_type = "intersect", partitioner = partitioner
+      pt_rdd, polygon_rdd,
+      join_type = "intersect", partitioner = partitioner
     )
 
     expect_equal(invoke(pair_rdd$.jobj, "count"), 1207)

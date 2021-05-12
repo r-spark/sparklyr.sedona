@@ -137,9 +137,10 @@ ensure_consistent_spatial_partitioning_impl.character <- function(
   query_window_rdd_partitioner <- query_window_rdd$.jobj %>%
     invoke("getPartitioner")
   if (!spatial_rdd_partitioner %>%
-        invoke("equals", query_window_rdd_partitioner)) {
+    invoke("equals", query_window_rdd_partitioner)) {
     sedona_apply_spatial_partitioner(
-      query_window_rdd, partitioner = spatial_rdd_partitioner
+      query_window_rdd,
+      partitioner = spatial_rdd_partitioner
     )
   }
 }
@@ -165,7 +166,8 @@ ensure_spatial_index <- function(
     for (x in list(spatial_rdd, query_window_rdd)) {
       if (!identical(x$.state$spatial_partitions_index_type, index_type)) {
         sedona_build_index(
-          x, type = index_type, index_spatial_partitions = TRUE
+          x,
+          type = index_type, index_spatial_partitions = TRUE
         )
       }
     }

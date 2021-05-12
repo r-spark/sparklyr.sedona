@@ -316,9 +316,9 @@ test_that("sedona_save_spatial_rdd() works as expected", {
           "ST_Point(CAST(123 AS Decimal(24, 20)), CAST(456 AS Decimal(24, 20)))"
         )
       ) %>%
-    sedona_save_spatial_rdd(
-      spatial_col = "pt", output_location = location, output_format = fmt
-    )
+      sedona_save_spatial_rdd(
+        spatial_col = "pt", output_location = location, output_format = fmt
+      )
     sdf <- do.call(paste0("sedona_read_", fmt), list(sc, location))
 
     expect_equal(

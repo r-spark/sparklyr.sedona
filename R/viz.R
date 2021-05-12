@@ -89,18 +89,18 @@ sedona_render_heatmap <- function(
 #' @family Sedona visualization routines
 #' @export
 sedona_render_scatter_plot <- function(
-                                  rdd,
-                                  resolution_x,
-                                  resolution_y,
-                                  output_location,
-                                  output_format = c("png", "gif", "svg"),
-                                  boundary = NULL,
-                                  color_of_variation = c("red", "green", "blue"),
-                                  base_color = c(0, 0, 0),
-                                  shade = TRUE,
-                                  reverse_coords = FALSE,
-                                  overlay = NULL,
-                                  browse = interactive()) {
+                                       rdd,
+                                       resolution_x,
+                                       resolution_y,
+                                       output_location,
+                                       output_format = c("png", "gif", "svg"),
+                                       boundary = NULL,
+                                       color_of_variation = c("red", "green", "blue"),
+                                       base_color = c(0, 0, 0),
+                                       shade = TRUE,
+                                       reverse_coords = FALSE,
+                                       overlay = NULL,
+                                       browse = interactive()) {
   viz_op <- sedona_render_viz_effect(
     viz_effect_name = "ScatterPlot",
     rdd = rdd,
@@ -215,9 +215,11 @@ sedona_render_viz_effect <- function(
 
 validate_base_color <- function(base_color) {
   if (!is.numeric(base_color) || length(base_color) != 3) {
-    stop("Base color (`base_color`) must be a numeric vector of length 3 ",
-         "specifying values for red, green, and blue channels ",
-         "(e.g., c(0, 0, 0)).")
+    stop(
+      "Base color (`base_color`) must be a numeric vector of length 3 ",
+      "specifying values for red, green, and blue channels ",
+      "(e.g., c(0, 0, 0))."
+    )
   }
 }
 
@@ -230,13 +232,17 @@ validate_boundary <- function(rdd, boundary) {
     boundary
   } else if (is.numeric(boundary)) {
     if (length(boundary) != 4) {
-      stop("Boundary specification with numeric vector must consist of ",
-           "exactly 4 values: c(min_x, max_x, min_y, max_y).")
+      stop(
+        "Boundary specification with numeric vector must consist of ",
+        "exactly 4 values: c(min_x, max_x, min_y, max_y)."
+      )
     }
     do.call(new_bounding_box, append(list(sc), as.list(boundary)))
   } else {
-    stop("Boundary specification must be either NULL, a numeric vector of ",
-         "c(min_x, max_x, min_y, max_y) values, or a bounding box object")
+    stop(
+      "Boundary specification must be either NULL, a numeric vector of ",
+      "c(min_x, max_x, min_y, max_y) values, or a bounding box object"
+    )
   }
 }
 

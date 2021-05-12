@@ -46,7 +46,8 @@ test_that("sedona_apply_spatial_partitioner() works with custom max_levels setti
     repartition = 4L
   )
   sedona_apply_spatial_partitioner(
-    pt_rdd, partitioner = "kdbtree", max_levels = 8
+    pt_rdd,
+    partitioner = "kdbtree", max_levels = 8
   )
 
   expect_gt(
@@ -70,10 +71,12 @@ test_that("sedona_apply_spatial_partitioner() works with custom partitioner", {
     type = "polygon"
   )
   sedona_apply_spatial_partitioner(
-    pt_rdd, partitioner = "kdbtree", max_levels = 8
+    pt_rdd,
+    partitioner = "kdbtree", max_levels = 8
   )
   sedona_apply_spatial_partitioner(
-    polygon_rdd, partitioner = invoke(pt_rdd$.jobj, "getPartitioner")
+    polygon_rdd,
+    partitioner = invoke(pt_rdd$.jobj, "getPartitioner")
   )
 
   expect_gt(
