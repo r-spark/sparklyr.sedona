@@ -3,6 +3,7 @@
 S3method(sdf_register,spatial_rdd)
 export(approx_count)
 export(as.spark.dataframe)
+export(crs_transform)
 export(minimum_bounding_box)
 export(new_bounding_box)
 export(sedona_apply_spatial_partitioner)

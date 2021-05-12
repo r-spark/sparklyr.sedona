@@ -62,6 +62,34 @@ approx_count <- function(x) {
     invoke("approximateTotalCount")
 }
 
+#' Perform a CRS transformation.
+#'
+#' Transform data within a spatial RDD from one coordinate reference system to
+#' another.
+#'
+#' @param x The spatial RDD to be processed.
+#' @param src_epsg_crs_code Coordinate reference system to transform from
+#'  (e.g., "epsg:4326", "epsg:3857", etc).
+#' @param dst_epsg_crs_code Coordinate reference system to transform to.
+#'  (e.g., "epsg:4326", "epsg:3857", etc).
+#' @param strict If FALSE (default), then ignore the "Bursa-Wolf Parameters
+#'   Required" error.
+#'
+#' @export
+crs_transform <- function(
+                          x,
+                          src_epsg_crs_code,
+                          dst_epsg_crs_code,
+                          strict = FALSE) {
+  successful <- x$.jobj %>%
+    invoke("CRSTransform", src_epsg_crs_code, dst_epsg_crs_code, !strict)
+  if (!successful) {
+    stop("Failed to perform CRS transformation.")
+  }
+
+  x
+}
+
 new_spatial_rdd <- function(jobj, type, ...) {
   structure(
     list(.jobj = jobj, .state = new.env(parent = emptyenv())),
