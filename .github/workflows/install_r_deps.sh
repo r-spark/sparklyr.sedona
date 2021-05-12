@@ -6,7 +6,7 @@ TEST_DEPS="testthat"
 SEP='"\\s+"'
 
 R_REMOTES_NO_ERRORS_FROM_WARNINGS=true Rscript - <<_RSCRIPT_EOF_
-  if (!require(devtools))
+  if (!require(remotes))
     install.packages("remotes")
   remotes::install_deps(dependencies = c("Imports"))
 
