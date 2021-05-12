@@ -19,6 +19,9 @@ sedona_read_wkt(
 
 \item{location}{Location of the data source.}
 
+\item{wkt_col}{Zero-based index of column containing hex-encoded WKB data
+(default: 0).}
+
 \item{allow_invalid_geometries}{Whether to allow topology-invalid
 geometries to exist in the resulting RDD.}
 
@@ -30,9 +33,6 @@ errorings.}
 
 \item{repartition}{The minimum number of partitions to have in the resulting
 RDD (default: 1).}
-
-\item{wkb_col}{Zero-based index of column containing hex-encoded WKB data
-(default: 0).}
 }
 \description{
 Create a generic SpatialRDD from a Well-Known Text (WKT) data source.

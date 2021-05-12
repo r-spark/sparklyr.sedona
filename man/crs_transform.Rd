@@ -9,9 +9,11 @@ crs_transform(x, src_epsg_crs_code, dst_epsg_crs_code, strict = FALSE)
 \arguments{
 \item{x}{The spatial RDD to be processed.}
 
-\item{src_epsg_crs_code}{Coordinate reference system to transform from.}
+\item{src_epsg_crs_code}{Coordinate reference system to transform from
+(e.g., "epsg:4326", "epsg:3857", etc).}
 
-\item{dst_epsg_crs_code}{Coordinate reference system to transform to.}
+\item{dst_epsg_crs_code}{Coordinate reference system to transform to.
+(e.g., "epsg:4326", "epsg:3857", etc).}
 
 \item{strict}{If FALSE (default), then ignore the "Bursa-Wolf Parameters
 Required" error.}

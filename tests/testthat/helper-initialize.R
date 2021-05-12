@@ -1,4 +1,4 @@
-testthat_spark_connection <- function(conn_attempts, conn_retry_interval_s = 2) {
+testthat_spark_connection <- function(conn_retry_interval_s = 2) {
   conn_key <- ".testthat_spark_connection"
   if (!exists(conn_key, envir = .GlobalEnv)) {
     version <- Sys.getenv("SPARK_VERSION")

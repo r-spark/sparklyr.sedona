@@ -250,7 +250,7 @@ sedona_read_wkb <- function(
 #' Create a generic SpatialRDD from a Well-Known Text (WKT) data source.
 #'
 #' @inheritParams sedona_spatial_rdd_data_source
-#' @param wkb_col Zero-based index of column containing hex-encoded WKB data
+#' @param wkt_col Zero-based index of column containing hex-encoded WKB data
 #'   (default: 0).
 #' @param allow_invalid_geometries Whether to allow topology-invalid
 #'   geometries to exist in the resulting RDD.
