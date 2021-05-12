@@ -9,20 +9,31 @@ spark_dependencies <- function(spark_version, scala_version, ...) {
     stop("Unsupported Spark version: ", spark_version)
   }
 
+  packages <- c(
+    "org.datasyslab:geotools-wrapper:geotools-24.0",
+    "org.datasyslab:sernetcdf:0.1.0",
+    "org.locationtech.jts:jts-core:1.18.0",
+    "org.wololo:jts2geojson:0.14.3"
+  )
+  jars <- NULL
+
+  sedona_jar_files <- Sys.getenv("SEDONA_JAR_FILES")
+  if (nchar(sedona_jar_files) > 0) {
+    jars <- strsplit(sedona_jar_files, ":")[[1]]
+  } else {
+    packages <- c(
+      paste0(
+        "org.apache.sedona:sedona-",
+        c("core", "sql", "viz"),
+        sprintf("-%s_%s:1.0.0-incubating", spark_version, scala_version)
+      ),
+      packages
+    )
+  }
+
   spark_dependency(
-    packages = (
-      c(
-        paste0(
-          "org.apache.sedona:sedona-",
-          c("core", "sql", "viz"),
-          sprintf("-%s_%s:1.0.0-incubating", spark_version, scala_version)
-        ),
-        "org.datasyslab:geotools-wrapper:geotools-24.0",
-        "org.datasyslab:sernetcdf:0.1.0",
-        "org.locationtech.jts:jts-core:1.18.0",
-        "org.wololo:jts2geojson:0.14.3"
-      )
-    ),
+    jars = jars,
+    packages = packages,
     initializer = sedona_initialize_spark_connection,
     dbplyr_sql_variant = sedona_dbplyr_sql_variant()
   )
