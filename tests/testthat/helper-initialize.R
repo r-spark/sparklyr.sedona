@@ -58,13 +58,13 @@ expect_boundary_envelope <- function(rdd, expected) {
   ) %>%
     unlist()
 
-  expect_equal(actual, expected)
+  testthat::expect_equal(actual, expected)
 }
 
 expect_geom_equal <- function(sc, lhs, rhs) {
-  expect_equal(length(lhs), length(rhs))
+  testthat::expect_equal(length(lhs), length(rhs))
   for (i in seq_along(lhs)) {
-    expect_true(
+    testthat::expect_true(
       invoke_static(
         sc,
         "org.apache.sedona.core.utils.GeomUtils",
@@ -83,11 +83,11 @@ as.coordinate_list <- function(geometry) {
 }
 
 expect_coordinates_equal <- function(geometry, coords) {
-  expect_equal(as.coordinate_list(geometry), coords)
+  testthat::expect_equal(as.coordinate_list(geometry), coords)
 }
 
 expect_coordinate_lists_setequal <- function(geometries, coords_list) {
-  expect_setequal(
+  testthat::expect_setequal(
     geometries %>%
       lapply(
         function(geometry) {

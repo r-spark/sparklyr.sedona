@@ -129,19 +129,17 @@ ensure_consistent_spatial_partitioning_impl.character <- function(
                                                                   partitioner = c("quadtree", "kdbtree"),
                                                                   spatial_rdd = NULL,
                                                                   query_window_rdd = NULL) {
-  sc <- spark_connection(spatial_rdd$.jobj)
   partitioner <- match.arg(partitioner)
   if (!identical(spatial_rdd$.state$spatial_partitioner_type, partitioner)) {
     sedona_apply_spatial_partitioner(spatial_rdd, partitioner = partitioner)
   }
-  spatial_rdd_partitioner_jobj <- spatial_rdd$.jobj %>%
+  spatial_rdd_partitioner <- spatial_rdd$.jobj %>% invoke("getPartitioner")
+  query_window_rdd_partitioner <- query_window_rdd$.jobj %>%
     invoke("getPartitioner")
-  query_window_rdd_partitioner_jobj <- query_window_rdd$.jobj %>%
-    invoke("getPartitioner")
-  if (!spatial_rdd_partitioner_jobj %>%
-        invoke("equals", query_window_rdd_partitioner_jobj)) {
+  if (!spatial_rdd_partitioner %>%
+        invoke("equals", query_window_rdd_partitioner)) {
     sedona_apply_spatial_partitioner(
-      query_window_rdd, partitioner = spatial_rdd_partitioner_jobj
+      query_window_rdd, partitioner = spatial_rdd_partitioner
     )
   }
 }
