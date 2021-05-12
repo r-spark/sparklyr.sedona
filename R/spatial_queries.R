@@ -93,11 +93,11 @@ sedona_knn_query <- function(
 #' @family Sedona spatial query
 #' @export
 sedona_range_query <- function(
-                             rdd,
-                             x,
-                             query_type = c("cover", "intersect"),
-                             index_type = c("quadtree", "rtree"),
-                             result_type = c("rdd", "sdf", "raw")) {
+                               rdd,
+                               x,
+                               query_type = c("cover", "intersect"),
+                               index_type = c("quadtree", "rtree"),
+                               result_type = c("rdd", "sdf", "raw")) {
   as.spatial_rdd <- function(sc, result_rdd) {
     raw_spatial_rdd <- invoke_new(
       sc, "org.apache.sedona.core.spatialRDD.SpatialRDD"

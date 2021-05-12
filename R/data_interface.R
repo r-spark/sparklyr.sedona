@@ -55,8 +55,10 @@ sedona_read_dsv_to_typed_rdd <- function(
   } else {
     if (!is.null(last_spatial_col_index)) {
       if (as.integer(last_spatial_col_index) != first_spatial_col_index + 1L) {
-        stop("last_spatial_col_index must be either unspecified or be equal to ",
-             "(first_spatial_col_index + 1) for PointRDD")
+        stop(
+          "last_spatial_col_index must be either unspecified or be equal to ",
+          "(first_spatial_col_index + 1) for PointRDD"
+        )
       }
     } else {
       last_spatial_col_index <- first_spatial_col_index + 1L
@@ -66,7 +68,7 @@ sedona_read_dsv_to_typed_rdd <- function(
   fmt <- (
     if (identical(type, "point")) {
       if (!is.null(last_spatial_col_index) &&
-          last_spatial_col_index != first_spatial_col_index + 1L) {
+        last_spatial_col_index != first_spatial_col_index + 1L) {
       }
       invoke_new(
         sc,
@@ -94,8 +96,7 @@ sedona_read_dsv_to_typed_rdd <- function(
         delimiter,
         has_non_spatial_attrs
       )
-    }
-  )
+    })
 
   invoke_new(
     sc,

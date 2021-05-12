@@ -3,7 +3,8 @@ context("CRS transform")
 test_that("crs_transform() works as expected", {
   sc <- testthat_spark_connection()
   pt_rdd <- sedona_read_dsv_to_typed_rdd(
-    sc, test_data("crs-test-point.csv"), type = "point"
+    sc, test_data("crs-test-point.csv"),
+    type = "point"
   ) %>%
     crs_transform("epsg:4326", "epsg:3857")
 
