@@ -16,7 +16,8 @@ Depends:
     R (>= 3.2)
 Imports:
     rlang,
-    sparklyr (>= 1.3)
+    sparklyr (>= 1.3),
+    dbplyr (>= 1.1.0)
 Encoding: UTF-8
 RoxygenNote: 7.1.1
 SystemRequirements: Spark: 2.4.x or 3.x
