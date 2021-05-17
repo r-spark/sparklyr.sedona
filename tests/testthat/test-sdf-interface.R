@@ -2,14 +2,7 @@ context("sdf interface")
 
 sc <- testthat_spark_connection()
 
-pt_rdd <- sedona_read_dsv_to_typed_rdd(
-  sc,
-  location = test_data("arealm-small.csv"),
-  delimiter = ",",
-  type = "point",
-  first_spatial_col_index = 1,
-  has_non_spatial_attrs = TRUE
-)
+pt_rdd <- read_point_rdd_with_non_spatial_attrs()
 
 test_that("sdf_register() works as expected for Spatial RDDs", {
   sdf_name <- random_string("spatial_sdf")

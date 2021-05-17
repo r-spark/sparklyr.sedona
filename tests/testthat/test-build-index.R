@@ -3,11 +3,7 @@ context("build index")
 sc <- testthat_spark_connection()
 
 test_that("sedona_build_index() works as expected on raw partitions", {
-  pt_rdd <- sedona_read_dsv_to_typed_rdd(
-    sc,
-    location = test_data("arealm.csv"),
-    type = "point"
-  )
+  pt_rdd <- read_point_rdd()
 
   sedona_build_index(pt_rdd, type = "quadtree")
   indexed_raw_rdd <- invoke(pt_rdd$.jobj, "indexedRawRDD")
@@ -31,12 +27,7 @@ test_that("sedona_build_index() works as expected on raw partitions", {
 })
 
 test_that("sedona_build_index() works as expected on spatial partitions", {
-  pt_rdd <- sedona_read_dsv_to_typed_rdd(
-    sc,
-    location = test_data("arealm.csv"),
-    type = "point",
-    repartition = 5
-  )
+  pt_rdd <- read_point_rdd(repartition = 5)
   sedona_apply_spatial_partitioner(pt_rdd, partitioner = "quadtree")
   sedona_build_index(pt_rdd, type = "rtree")
   indexed_rdd <- invoke(pt_rdd$.jobj, "indexedRDD")
