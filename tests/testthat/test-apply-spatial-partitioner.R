@@ -3,12 +3,7 @@ context("apply spatial partition")
 sc <- testthat_spark_connection()
 
 test_that("sedona_apply_spatial_partitioner() works as expected for quadtree partitioner", {
-  pt_rdd <- sedona_read_dsv_to_typed_rdd(
-    sc,
-    location = test_data("arealm.csv"),
-    type = "point",
-    repartition = 4L
-  )
+  pt_rdd <- read_point_rdd(repartition = 4L)
   sedona_apply_spatial_partitioner(pt_rdd, partitioner = "quadtree")
 
   expect_gt(
@@ -21,12 +16,7 @@ test_that("sedona_apply_spatial_partitioner() works as expected for quadtree par
 })
 
 test_that("sedona_apply_spatial_partitioner() works as expected for kdbtree partitioner", {
-  pt_rdd <- sedona_read_dsv_to_typed_rdd(
-    sc,
-    location = test_data("arealm.csv"),
-    type = "point",
-    repartition = 4L
-  )
+  pt_rdd <- read_point_rdd(repartition = 4L)
   sedona_apply_spatial_partitioner(pt_rdd, partitioner = "kdbtree")
 
   expect_gt(
@@ -39,12 +29,7 @@ test_that("sedona_apply_spatial_partitioner() works as expected for kdbtree part
 })
 
 test_that("sedona_apply_spatial_partitioner() works with custom max_levels setting", {
-  pt_rdd <- sedona_read_dsv_to_typed_rdd(
-    sc,
-    location = test_data("arealm.csv"),
-    type = "point",
-    repartition = 4L
-  )
+  pt_rdd <- read_point_rdd(repartition = 4L)
   sedona_apply_spatial_partitioner(
     pt_rdd,
     partitioner = "kdbtree", max_levels = 8
@@ -59,17 +44,8 @@ test_that("sedona_apply_spatial_partitioner() works with custom max_levels setti
 })
 
 test_that("sedona_apply_spatial_partitioner() works with custom partitioner", {
-  pt_rdd <- sedona_read_dsv_to_typed_rdd(
-    sc,
-    location = test_data("arealm.csv"),
-    type = "point",
-    repartition = 4L
-  )
-  polygon_rdd <- sedona_read_dsv_to_typed_rdd(
-    sc,
-    location = test_data("primaryroads-polygon.csv"),
-    type = "polygon"
-  )
+  pt_rdd <- read_point_rdd(repartition = 4L)
+  polygon_rdd <- read_polygon_rdd()
   sedona_apply_spatial_partitioner(
     pt_rdd,
     partitioner = "kdbtree", max_levels = 8

@@ -3,12 +3,7 @@ context("visualization")
 sc <- testthat_spark_connection()
 
 test_that("sedona_render_heatmap() works as expected", {
-  pt_rdd <- sedona_read_dsv_to_typed_rdd(
-    sc,
-    location = test_data("arealm-small.csv"),
-    type = "point",
-    first_spatial_col_index = 1
-  )
+  pt_rdd <- read_point_rdd_with_non_spatial_attrs()
 
   sedona_render_heatmap(
     pt_rdd,
@@ -23,11 +18,7 @@ test_that("sedona_render_heatmap() works as expected", {
 })
 
 test_that("sedona_render_scatter_plot() works as expected", {
-  pt_rdd <- sedona_read_dsv_to_typed_rdd(
-    sc,
-    location = test_data("arealm.csv"),
-    type = "point"
-  )
+  pt_rdd <- read_point_rdd()
 
   sedona_render_scatter_plot(
     pt_rdd,
@@ -42,16 +33,8 @@ test_that("sedona_render_scatter_plot() works as expected", {
 })
 
 test_that("sedona_render_choropleth_map() works as expected", {
-  pt_rdd <- sedona_read_dsv_to_typed_rdd(
-    sc,
-    location = test_data("arealm.csv"),
-    type = "point"
-  )
-  polygon_rdd <- sedona_read_dsv_to_typed_rdd(
-    sc,
-    location = test_data("primaryroads-polygon.csv"),
-    type = "polygon"
-  )
+  pt_rdd <- read_point_rdd()
+  polygon_rdd <- read_polygon_rdd()
   invoke(
     pt_rdd$.jobj,
     "spatialPartitioning",
@@ -104,16 +87,8 @@ test_that("overlay operator works as expected", {
   resolution_y <- 600
   boundary <- c(-126.790180, -64.630926, 24.863836, 50.000)
 
-  pt_rdd <- sedona_read_dsv_to_typed_rdd(
-    sc,
-    location = test_data("arealm.csv"),
-    type = "point"
-  )
-  polygon_rdd <- sedona_read_dsv_to_typed_rdd(
-    sc,
-    location = test_data("primaryroads-polygon.csv"),
-    type = "polygon"
-  )
+  pt_rdd <- read_point_rdd()
+  polygon_rdd <- read_polygon_rdd()
   pair_rdd <- sedona_spatial_join_count_by_key(
     pt_rdd,
     polygon_rdd,

@@ -40,12 +40,31 @@ test_data <- function(file_name) {
   file.path(normalizePath(getwd()), "data", file_name)
 }
 
-read_polygon_rdd <- function() {
+read_point_rdd <- function(repartition = NULL) {
+  sedona_read_dsv_to_typed_rdd(
+    testthat_spark_connection(),
+    location = test_data("arealm.csv"),
+    type = "point",
+    repartition = repartition
+  )
+}
+
+read_point_rdd_with_non_spatial_attrs <- function(repartition = NULL) {
+  sedona_read_dsv_to_typed_rdd(
+    testthat_spark_connection(),
+    location = test_data("arealm-small.csv"),
+    type = "point",
+    first_spatial_col_index = 1,
+    repartition = repartition
+  )
+}
+
+read_polygon_rdd <- function(repartition = NULL) {
   polygon_rdd <- sedona_read_dsv_to_typed_rdd(
     testthat_spark_connection(),
     location = test_data("primaryroads-polygon.csv"),
-    delimiter = ",",
-    type = "polygon"
+    type = "polygon",
+    repartition = repartition
   )
 }
 
