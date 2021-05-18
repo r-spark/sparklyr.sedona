@@ -11,11 +11,30 @@ as.spark.dataframe(x, non_spatial_cols = NULL, name = NULL)
 
 \item{non_spatial_cols}{Column names for non-spatial attributes in the
 resulting Spark Dataframe.}
-
-\item{name}{Name to assign to the resulting Spark temporary view. If
-unspecified, then a random name will be assigned.}
 }
 \description{
 Import data from a spatial RDD (possibly with non-spatial attributes) into a
 Spark Dataframe.
+}
+\examples{
+library(sparklyr)
+library(sparklyr.sedona)
+
+sc <- spark_connect(master = "spark://HOST:PORT")
+
+if (!inherits(sc, "test_connection")) {
+  input_location <- system.file(
+    file.path("extdata", "arealm-tiny.csv"), package = "sparklyr.sedona"
+  )
+  rdd <- sedona_read_dsv_to_typed_rdd(
+    sc,
+    location = input_location,
+    delimiter = ",",
+    type = "point",
+    first_spatial_col_index = 1L,
+    repartition = 5
+  )
+  sdf <- as.spark.dataframe(rdd, non_spatial_cols = c("attr1", "attr2"))
+}
+
 }

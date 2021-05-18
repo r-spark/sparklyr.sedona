@@ -14,12 +14,30 @@ sedona_write_wkt(x, output_location)
 \description{
 Export serialized data from a Sedona SpatialRDD into a WKT file.
 }
+\examples{
+library(sparklyr)
+library(sparklyr.sedona)
+
+sc <- spark_connect("spark://HOST:PORT")
+
+if (!inherits(sc, "test_connection")) {
+  input_location <- system.file(
+    file.path("extdata", "wkt-example.tsv"), package = "sparklyr.sedona"
+  )
+  rdd <- sedona_read_wkt(
+    sc,
+    location = input_location,
+    wkt_col_idx = 0L
+  )
+  sedona_write_wkt(rdd, "/tmp/wkt_output.tsv")
+}
+
+}
 \seealso{
 Other Sedona data inferface functions: 
 \code{\link{sedona_read_dsv_to_typed_rdd}()},
 \code{\link{sedona_read_geojson_to_typed_rdd}()},
 \code{\link{sedona_read_geojson}()},
-\code{\link{sedona_read_shapefile_to_typed_rdd}()},
 \code{\link{sedona_read_shapefile}()},
 \code{\link{sedona_read_wkb}()},
 \code{\link{sedona_read_wkt}()},

@@ -19,3 +19,18 @@ data source. The input should contain exactly one spatial column and all
 other non-spatial columns will be treated as custom user-defined attributes
 in the resulting spatial RDD.
 }
+\examples{
+library(sparklyr)
+library(sparklyr.sedona)
+
+sc <- spark_connect(master = "spark://HOST:PORT")
+
+if (!inherits(sc, "test_connection")) {
+  tbl <- dplyr::tbl(
+    sc,
+    dplyr::sql("SELECT ST_GeomFromText('POINT(-71.064544 42.28787)') AS `pt`")
+  )
+  rdd <- to_spatial_rdd(tbl, "pt")
+}
+
+}

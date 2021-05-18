@@ -74,7 +74,7 @@ test_that("sedona_render_choropleth_map() works as expected", {
     pair_rdd,
     1000,
     600,
-    output_location = tempfile("scatter-plot-"),
+    output_location = tempfile("choropleth-map-"),
     boundary = c(-126.790180, -64.630926, 24.863836, 50.000),
     base_color = c(255, 255, 255)
   )

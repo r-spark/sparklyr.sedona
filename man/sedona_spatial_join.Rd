@@ -45,6 +45,40 @@ pairs of geometrical elements (p, q) such that p is an element of
 `spatial_rdd`, q is an element of `query_window_rdd`, and (p, q) satisfies
 the spatial relation specified by `join_type`.
 }
+\examples{
+library(sparklyr)
+library(sparklyr.sedona)
+
+sc <- spark_connect(master = "spark://HOST:PORT")
+
+if (!inherits(sc, "test_connection")) {
+  input_location <- system.file(
+    file.path("extdata", "arealm-tiny.csv"), package = "sparklyr.sedona"
+  )
+  rdd <- sedona_read_dsv_to_typed_rdd(
+    sc,
+    location = input_location,
+    delimiter = ",",
+    type = "point",
+    first_spatial_col_index = 1L
+  )
+  query_rdd_input_location <- system.file(
+    file.path("extdata", "shapefile-example"), package = "sparklyr.sedona"
+  )
+  query_rdd <- sedona_read_shapefile_to_typed_rdd(
+    sc,
+    location = query_rdd_input_location,
+    type = "polygon"
+  )
+  join_result_rdd <- sedona_spatial_join(
+    rdd,
+    query_rdd,
+    join_type = "intersect",
+    partitioner = "quadtree"
+  )
+}
+
+}
 \seealso{
 Other Sedona spatial join operator: 
 \code{\link{sedona_spatial_join_count_by_key}()}

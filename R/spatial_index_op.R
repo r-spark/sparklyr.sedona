@@ -13,6 +13,24 @@
 #'   Notice this option is irrelevant if the input RDD has not been partitioned
 #'   using with a spatial partitioner yet.
 #'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   input_location <- system.file(
+#'     file.path("extdata", "shapefile-example"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_shapefile_to_typed_rdd(
+#'     sc,
+#'     location = input_location,
+#'     type = "polygon"
+#'   )
+#'   sedona_build_index(rdd, type = "rtree")
+#' }
+#'
 #' @export
 sedona_build_index <- function(
                                rdd,

@@ -33,11 +33,24 @@ RDD (default: 1).}
 \description{
 Create a generic SpatialRDD from a GeoJSON data source.
 }
+\examples{
+library(sparklyr)
+library(sparklyr.sedona)
+
+sc <- spark_connect(master = "spark://HOST:PORT")
+
+if (!inherits(sc, "test_connection")) {
+  input_location <- system.file(
+    file.path("extdata", "polygon.json"), package = "sparklyr.sedona"
+  )
+  rdd <- sedona_read_geojson(sc, location = input_location)
+}
+
+}
 \seealso{
 Other Sedona data inferface functions: 
 \code{\link{sedona_read_dsv_to_typed_rdd}()},
 \code{\link{sedona_read_geojson_to_typed_rdd}()},
-\code{\link{sedona_read_shapefile_to_typed_rdd}()},
 \code{\link{sedona_read_shapefile}()},
 \code{\link{sedona_read_wkb}()},
 \code{\link{sedona_read_wkt}()},

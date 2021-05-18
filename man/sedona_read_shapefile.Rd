@@ -16,12 +16,25 @@ sedona_read_shapefile(sc, location, storage_level = "MEMORY_ONLY")
 \description{
 Create a generic SpatialRDD from a shapefile data source.
 }
+\examples{
+library(sparklyr)
+library(sparklyr.sedona)
+
+sc <- spark_connect(master = "spark://HOST:PORT")
+
+if (!inherits(sc, "test_connection")) {
+  input_location <- system.file(
+    file.path("extdata", "shapefile-example"), package = "sparklyr.sedona"
+  )
+  rdd <- sedona_read_shapefile(sc, location = input_location)
+}
+
+}
 \seealso{
 Other Sedona data inferface functions: 
 \code{\link{sedona_read_dsv_to_typed_rdd}()},
 \code{\link{sedona_read_geojson_to_typed_rdd}()},
 \code{\link{sedona_read_geojson}()},
-\code{\link{sedona_read_shapefile_to_typed_rdd}()},
 \code{\link{sedona_read_wkb}()},
 \code{\link{sedona_read_wkt}()},
 \code{\link{sedona_save_spatial_rdd}()},

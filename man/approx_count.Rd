@@ -13,6 +13,23 @@ approx_count(x)
 Given a Sedona spatial RDD, find the (possibly approximated) number of total
 records within it.
 }
+\examples{
+library(sparklyr)
+library(sparklyr.sedona)
+
+sc <- spark_connect(master = "spark://HOST:PORT")
+
+if (!inherits(sc, "test_connection")) {
+  input_location <- system.file(
+    file.path("extdata", "shapefile-example"), package = "sparklyr.sedona"
+  )
+  rdd <- sedona_read_shapefile_to_typed_rdd(
+    sc, location = input_location, type = "polygon"
+  )
+  approx_cnt <- approx_count(rdd)
+}
+
+}
 \seealso{
 Other Spatial RDD aggregation routine: 
 \code{\link{minimum_bounding_box}()}

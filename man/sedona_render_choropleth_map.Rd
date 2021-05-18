@@ -63,6 +63,47 @@ interactive()).}
 Generate a choropleth map of a pair RDD assigning integral values to
 polygons.
 }
+\examples{
+library(sparklyr)
+library(sparklyr.sedona)
+
+sc <- spark_connect(master = "spark://HOST:PORT")
+
+if (!inherits(sc, "test_connection")) {
+  pt_input_location <- system.file(
+    file.path("extdata", "arealm-small.csv"), package = "sparklyr.sedona"
+  )
+  pt_rdd <- sedona_read_dsv_to_typed_rdd(
+    sc,
+    location = pt_input_location,
+    type = "point",
+    first_spatial_col_index = 1
+  )
+  polygon_input_location <- system.file(
+    file.path("extdata", "polygon.json"), package = "sparklyr.sedona"
+  )
+  polygon_rdd <- sedona_read_geojson_to_typed_rdd(
+    sc,
+    location = polygon_input_location,
+    type = "polygon"
+  )
+  join_result_rdd <- sedona_spatial_join_count_by_key(
+    pt_rdd,
+    polygon_rdd,
+    join_type = "intersect",
+    partitioner = "quadtree"
+  )
+  sedona_render_choropleth_map(
+    join_result_rdd,
+    400,
+    200,
+    output_location = tempfile("choropleth-map-"),
+    boundary = c(-86.8, -86.6, 33.4, 33.6),
+    base_color = c(255, 255, 255)
+  )
+}
+
+}
 \seealso{
 Other Sedona visualization routines: 
 \code{\link{sedona_render_heatmap}()},

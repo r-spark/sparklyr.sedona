@@ -10,6 +10,20 @@
 #'   representing a Spark SQL query.
 #' @param spatial_col The name of the spatial column.
 #'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   tbl <- dplyr::tbl(
+#'     sc,
+#'     dplyr::sql("SELECT ST_GeomFromText('POINT(-71.064544 42.28787)') AS `pt`")
+#'   )
+#'   rdd <- to_spatial_rdd(tbl, "pt")
+#' }
+#'
 #' @export
 to_spatial_rdd <- function(x, spatial_col) {
   sdf <- x %>% spark_dataframe()
@@ -40,6 +54,22 @@ NULL
 #'
 #' @inheritParams sedona_spatial_rdd_aggregation_routine
 #'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   input_location <- system.file(
+#'     file.path("extdata", "shapefile-example"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_shapefile_to_typed_rdd(
+#'     sc, location = input_location, type = "polygon"
+#'   )
+#'   boundary <- minimum_bounding_box(rdd)
+#' }
+#'
 #' @family Spatial RDD aggregation routine
 #' @export
 minimum_bounding_box <- function(x) {
@@ -54,6 +84,22 @@ minimum_bounding_box <- function(x) {
 #' records within it.
 #'
 #' @inheritParams sedona_spatial_rdd_aggregation_routine
+#'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   input_location <- system.file(
+#'     file.path("extdata", "shapefile-example"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_shapefile_to_typed_rdd(
+#'     sc, location = input_location, type = "polygon"
+#'   )
+#'   approx_cnt <- approx_count(rdd)
+#' }
 #'
 #' @family Spatial RDD aggregation routine
 #' @export
@@ -74,6 +120,24 @@ approx_count <- function(x) {
 #'  (e.g., "epsg:4326", "epsg:3857", etc).
 #' @param strict If FALSE (default), then ignore the "Bursa-Wolf Parameters
 #'   Required" error.
+#'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   input_location <- system.file(
+#'     file.path("extdata", "polygon.json"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_geojson_to_typed_rdd(
+#'     sc, location = input_location, type = "polygon"
+#'   )
+#'   crs_transform(
+#'     rdd, src_epsg_crs_code = "epsg:4326", dst_epsg_crs_code = "epsg:3857"
+#'   )
+#' }
 #'
 #' @export
 crs_transform <- function(

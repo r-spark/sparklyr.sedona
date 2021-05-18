@@ -61,6 +61,33 @@ interactive()).}
 \description{
 Generate a scatter plot of geometrical object(s) within a Sedona spatial RDD.
 }
+\examples{
+library(sparklyr)
+library(sparklyr.sedona)
+
+sc <- spark_connect(master = "spark://HOST:PORT")
+
+if (!inherits(sc, "test_connection")) {
+  input_location <- system.file(
+    file.path("extdata", "arealm-small.csv"), package = "sparklyr.sedona"
+  )
+  rdd <- sedona_read_dsv_to_typed_rdd(
+    sc,
+    location = input_location,
+    type = "point"
+  )
+
+  sedona_render_scatter_plot(
+    rdd,
+    resolution_x = 800,
+    resolution_y = 600,
+    output_location = tempfile("arealm-small-"),
+    output_format = "png",
+    boundary = c(-91, -84, 30, 35)
+  )
+}
+
+}
 \seealso{
 Other Sedona visualization routines: 
 \code{\link{sedona_render_choropleth_map}()},

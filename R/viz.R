@@ -39,6 +39,34 @@ NULL
 #' @param blur_radius Controls the radius of a Gaussian blur in the resulting
 #'   heatmap.
 #'
+#' @examples
+#'
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   input_location <- system.file(
+#'     file.path("extdata", "arealm-small.csv"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_dsv_to_typed_rdd(
+#'     sc,
+#'     location = input_location,
+#'     type = "point"
+#'   )
+#'
+#'   sedona_render_heatmap(
+#'     rdd,
+#'     resolution_x = 800,
+#'     resolution_y = 600,
+#'     output_location = tempfile("arealm-small-"),
+#'     output_format = "png",
+#'     boundary = c(-91, -84, 30, 35),
+#'     blur_radius = 10
+#'   )
+#' }
+#'
 #' @family Sedona visualization routines
 #' @export
 sedona_render_heatmap <- function(
@@ -86,6 +114,32 @@ sedona_render_heatmap <- function(
 #' @param reverse_coords Whether to reverse spatial coordinates in the plot
 #'   (default: FALSE).
 #'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   input_location <- system.file(
+#'     file.path("extdata", "arealm-small.csv"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_dsv_to_typed_rdd(
+#'     sc,
+#'     location = input_location,
+#'     type = "point"
+#'   )
+#'
+#'   sedona_render_scatter_plot(
+#'     rdd,
+#'     resolution_x = 800,
+#'     resolution_y = 600,
+#'     output_location = tempfile("arealm-small-"),
+#'     output_format = "png",
+#'     boundary = c(-91, -84, 30, 35)
+#'   )
+#' }
+#'
 #' @family Sedona visualization routines
 #' @export
 sedona_render_scatter_plot <- function(
@@ -130,6 +184,46 @@ sedona_render_scatter_plot <- function(
 #'   java.lang.Long being values.
 #' @param reverse_coords Whether to reverse spatial coordinates in the plot
 #'   (default: FALSE).
+#'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   pt_input_location <- system.file(
+#'     file.path("extdata", "arealm-small.csv"), package = "sparklyr.sedona"
+#'   )
+#'   pt_rdd <- sedona_read_dsv_to_typed_rdd(
+#'     sc,
+#'     location = pt_input_location,
+#'     type = "point",
+#'     first_spatial_col_index = 1
+#'   )
+#'   polygon_input_location <- system.file(
+#'     file.path("extdata", "polygon.json"), package = "sparklyr.sedona"
+#'   )
+#'   polygon_rdd <- sedona_read_geojson_to_typed_rdd(
+#'     sc,
+#'     location = polygon_input_location,
+#'     type = "polygon"
+#'   )
+#'   join_result_rdd <- sedona_spatial_join_count_by_key(
+#'     pt_rdd,
+#'     polygon_rdd,
+#'     join_type = "intersect",
+#'     partitioner = "quadtree"
+#'   )
+#'   sedona_render_choropleth_map(
+#'     join_result_rdd,
+#'     400,
+#'     200,
+#'     output_location = tempfile("choropleth-map-"),
+#'     boundary = c(-86.8, -86.6, 33.4, 33.6),
+#'     base_color = c(255, 255, 255)
+#'   )
+#' }
 #'
 #' @family Sedona visualization routines
 #' @export

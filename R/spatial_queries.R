@@ -31,6 +31,37 @@ NULL
 #' @inheritParams spatial_query
 #' @param k Number of nearest spatail objects to return.
 #'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   knn_query_pt_x <- -84.01
+#'   knn_query_pt_y <- 34.01
+#'   knn_query_pt_tbl <- DBI::dbGetQuery(
+#'     sc,
+#'     sprintf(
+#'       "SELECT ST_GeomFromText(\"POINT(%f %f)\") AS `pt`",
+#'       knn_query_pt_x,
+#'       knn_query_pt_y
+#'     )
+#'   )
+#'   knn_query_pt <- knn_query_pt_tbl$pt[[1]]
+#'   input_location <- system.file(
+#'     file.path("extdata", "polygon.json"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_geojson_to_typed_rdd(
+#'     sc,
+#'     location = input_location,
+#'     type = "polygon"
+#'   )
+#'   knn_result_sdf <- sedona_knn_query(
+#'     rdd, x = knn_query_pt, k = 3, index_type = "rtree", result_type = "sdf"
+#'   )
+#' }
+#'
 #' @family Sedona spatial query
 #' @export
 sedona_knn_query <- function(
@@ -89,6 +120,47 @@ sedona_knn_query <- function(
 #' @inheritParams spatial_query
 #' @param query_type Type of spatial relationship involved in the query.
 #'   Currently "cover" and "intersect" are supported.
+#'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   range_query_min_x <- -87
+#'   range_query_max_x <- -50
+#'   range_query_min_y <- 34
+#'   range_query_max_y <- 54
+#'   geom_factory <- invoke_new(
+#'     sc,
+#'     "org.locationtech.jts.geom.GeometryFactory"
+#'   )
+#'   range_query_polygon <- invoke_new(
+#'     sc,
+#'     "org.locationtech.jts.geom.Envelope",
+#'     range_query_min_x,
+#'     range_query_max_x,
+#'     range_query_min_y,
+#'     range_query_max_y
+#'   ) %>%
+#'     invoke(geom_factory, "toGeometry", .)
+#'   input_location <- system.file(
+#'     file.path("extdata", "polygon.json"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_geojson_to_typed_rdd(
+#'     sc,
+#'     location = input_location,
+#'     type = "polygon"
+#'   )
+#'   range_query_result_sdf <- sedona_range_query(
+#'     rdd,
+#'     x = range_query_polygon,
+#'     query_type = "intersect",
+#'     index_type = "rtree",
+#'     result_type = "sdf"
+#'   )
+#' }
 #'
 #' @family Sedona spatial query
 #' @export

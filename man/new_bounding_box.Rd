@@ -20,3 +20,11 @@ new_bounding_box(sc, min_x = -Inf, max_x = Inf, min_y = -Inf, max_y = Inf)
 \description{
 Construct a axis-aligned rectangular bounding box object.
 }
+\examples{
+library(sparklyr)
+library(sparklyr.sedona)
+
+sc <- spark_connect(master = "spark://HOST:PORT")
+bb <- new_bounding_box(sc, -1, 1, -1, 1)
+
+}

@@ -8,6 +8,13 @@
 #' @param min_y Minimum y-value of the bounding box, can be +/- Inf.
 #' @param max_y Maximum y-value of the bounding box, can be +/- Inf.
 #'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#' bb <- new_bounding_box(sc, -1, 1, -1, 1)
+#'
 #' @export
 new_bounding_box <- function(
                              sc,

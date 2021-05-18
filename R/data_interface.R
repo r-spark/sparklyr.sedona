@@ -35,6 +35,25 @@ NULL
 #'   For all other types of RDDs, if last_spatial_col_index is unspecified, then
 #'   it will assume the value of -1 (i.e., the last of all input columns).
 #'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   input_location <- system.file(
+#'     file.path("extdata", "arealm-tiny.csv"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_dsv_to_typed_rdd(
+#'     sc,
+#'     location = input_location,
+#'     delimiter = ",",
+#'     type = "point",
+#'     first_spatial_col_index = 1L
+#'   )
+#' }
+#'
 #' @family Sedona data inferface functions
 #' @export
 sedona_read_dsv_to_typed_rdd <- function(
@@ -117,6 +136,21 @@ sedona_read_dsv_to_typed_rdd <- function(
 #'
 #' @inheritParams sedona_spatial_rdd_data_source
 #'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   input_location <- system.file(
+#'     file.path("extdata", "shapefile-example"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_shapefile_to_typed_rdd(
+#'     sc, location = input_location, type = "polygon"
+#'   )
+#' }
+#'
 #' @export
 sedona_read_shapefile_to_typed_rdd <- function(
                                                sc,
@@ -140,6 +174,21 @@ sedona_read_shapefile_to_typed_rdd <- function(
 #' LineStringRDD) from a GeoJSON data source.
 #'
 #' @inheritParams sedona_spatial_rdd_data_source
+#'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   input_location <- system.file(
+#'     file.path("extdata", "polygon.json"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_geojson_to_typed_rdd(
+#'     sc, location = input_location, type = "polygon"
+#'   )
+#' }
 #'
 #' @family Sedona data inferface functions
 #' @export
@@ -174,6 +223,19 @@ sedona_read_geojson_to_typed_rdd <- function(
 #'   automatically skip syntax-invalid geometries, rather than throwing
 #'   errorings.
 #'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   input_location <- system.file(
+#'     file.path("extdata", "polygon.json"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_geojson(sc, location = input_location)
+#' }
+#'
 #' @family Sedona data inferface functions
 #' @export
 sedona_read_geojson <- function(
@@ -207,7 +269,7 @@ sedona_read_geojson <- function(
 #' source.
 #'
 #' @inheritParams sedona_spatial_rdd_data_source
-#' @param wkb_col Zero-based index of column containing hex-encoded WKB data
+#' @param wkb_col_idx Zero-based index of column containing hex-encoded WKB data
 #'   (default: 0).
 #' @param allow_invalid_geometries Whether to allow topology-invalid
 #'   geometries to exist in the resulting RDD.
@@ -215,12 +277,27 @@ sedona_read_geojson <- function(
 #'   automatically skip syntax-invalid geometries, rather than throwing
 #'   errorings.
 #'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   input_location <- system.file(
+#'     file.path("extdata", "county_tiny_wkb.tsv"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_wkb(
+#'     sc, location = input_location, wkb_col_idx = 0L
+#'   )
+#' }
+#'
 #' @family Sedona data inferface functions
 #' @export
 sedona_read_wkb <- function(
                             sc,
                             location,
-                            wkb_col = 0L,
+                            wkb_col_idx = 0L,
                             allow_invalid_geometries = TRUE,
                             skip_syntactically_invalid_geometries = TRUE,
                             storage_level = "MEMORY_ONLY",
@@ -237,7 +314,7 @@ sedona_read_wkb <- function(
     "org.apache.sedona.core.formatMapper.WkbReader",
     "readToGeometryRDD",
     raw_text_rdd,
-    as.integer(wkb_col),
+    as.integer(wkb_col_idx),
     allow_invalid_geometries,
     skip_syntactically_invalid_geometries
   ) %>%
@@ -250,7 +327,7 @@ sedona_read_wkb <- function(
 #' Create a generic SpatialRDD from a Well-Known Text (WKT) data source.
 #'
 #' @inheritParams sedona_spatial_rdd_data_source
-#' @param wkt_col Zero-based index of column containing hex-encoded WKB data
+#' @param wkt_col_idx Zero-based index of column containing hex-encoded WKB data
 #'   (default: 0).
 #' @param allow_invalid_geometries Whether to allow topology-invalid
 #'   geometries to exist in the resulting RDD.
@@ -258,12 +335,29 @@ sedona_read_wkb <- function(
 #'   automatically skip syntax-invalid geometries, rather than throwing
 #'   errorings.
 #'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect("spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   input_location <- system.file(
+#'     file.path("extdata", "wkt-example.tsv"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_wkt(
+#'     sc,
+#'     location = input_location,
+#'     wkt_col_idx = 0L
+#'   )
+#' }
+#'
 #' @family Sedona data inferface functions
 #' @export
 sedona_read_wkt <- function(
                             sc,
                             location,
-                            wkt_col = 0L,
+                            wkt_col_idx = 0L,
                             allow_invalid_geometries = TRUE,
                             skip_syntactically_invalid_geometries = TRUE,
                             storage_level = "MEMORY_ONLY",
@@ -280,7 +374,7 @@ sedona_read_wkt <- function(
     "org.apache.sedona.core.formatMapper.WktReader",
     "readToGeometryRDD",
     raw_text_rdd,
-    as.integer(wkt_col),
+    as.integer(wkt_col_idx),
     allow_invalid_geometries,
     skip_syntactically_invalid_geometries
   ) %>%
@@ -288,36 +382,24 @@ sedona_read_wkt <- function(
     new_spatial_rdd(NULL)
 }
 
-#' Create a typed SpatialRDD from a shapefile data source.
-#'
-#' Create a typed SpatialRDD (namely, a PointRDD, a PolygonRDD, or a
-#' LineStringRDD) from a shapefile data source.
-#'
-#' @inheritParams sedona_spatial_rdd_data_source
-#'
-#' @family Sedona data inferface functions
-#' @export
-sedona_read_shapefile_to_typed_rdd <- function(
-                                               sc,
-                                               location,
-                                               type = c("point", "polygon", "linestring"),
-                                               storage_level = "MEMORY_ONLY") {
-  invoke_static(
-    sc,
-    "org.apache.sedona.core.formatMapper.shapefileParser.ShapefileReader",
-    paste0("readTo", to_camel_case(type), "RDD"),
-    java_context(sc),
-    location
-  ) %>%
-    set_storage_level(storage_level) %>%
-    new_spatial_rdd(type)
-}
-
 #' Create a SpatialRDD from a shapefile data source.
 #'
 #' Create a generic SpatialRDD from a shapefile data source.
 #'
 #' @inheritParams sedona_spatial_rdd_data_source
+#'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   input_location <- system.file(
+#'     file.path("extdata", "shapefile-example"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_shapefile(sc, location = input_location)
+#' }
 #'
 #' @family Sedona data inferface functions
 #' @export
@@ -352,6 +434,24 @@ NULL
 #'
 #' @inheritParams sedona_spatial_rdd_serialization_routine
 #'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   input_location <- system.file(
+#'     file.path("extdata", "county_tiny_wkb.tsv"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_wkb(
+#'     sc,
+#'     location = input_location,
+#'     wkb_col_idx = 0L
+#'   )
+#'   sedona_write_wkb(rdd, "/tmp/wkb_output.tsv")
+#' }
+#'
 #' @family Sedona data inferface functions
 #' @export
 sedona_write_wkb <- function(x, output_location) {
@@ -364,6 +464,24 @@ sedona_write_wkb <- function(x, output_location) {
 #'
 #' @inheritParams sedona_spatial_rdd_serialization_routine
 #'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect("spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   input_location <- system.file(
+#'     file.path("extdata", "wkt-example.tsv"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_wkt(
+#'     sc,
+#'     location = input_location,
+#'     wkt_col_idx = 0L
+#'   )
+#'   sedona_write_wkt(rdd, "/tmp/wkt_output.tsv")
+#' }
+#'
 #' @family Sedona data inferface functions
 #' @export
 sedona_write_wkt <- function(x, output_location) {
@@ -375,6 +493,22 @@ sedona_write_wkt <- function(x, output_location) {
 #' Export serialized data from a Sedona SpatialRDD into a GeoJSON file.
 #'
 #' @inheritParams sedona_spatial_rdd_serialization_routine
+#'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   input_location <- system.file(
+#'     file.path("extdata", "polygon.json"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_geojson_to_typed_rdd(
+#'     sc, location = input_location, type = "polygon"
+#'   )
+#'   sedona_write_geojson(rdd, "/tmp/example.json")
+#' }
 #'
 #' @family Sedona data inferface functions
 #' @export
@@ -392,6 +526,25 @@ sedona_write_geojson <- function(x, output_location) {
 #' @param spatial_col The name of the spatial column.
 #' @param output_location Location of the output file.
 #' @param output_format Format of the output.
+#'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   tbl <- dplyr::tbl(
+#'     sc,
+#'     dplyr::sql("SELECT ST_GeomFromText('POINT(-71.064544 42.28787)') AS `pt`")
+#'   )
+#'   sedona_save_spatial_rdd(
+#'     tbl %>% dplyr::mutate(id = 1),
+#'     spatial_col = "pt",
+#'     output_location = "/tmp/pts.wkb",
+#'     output_format = "wkb"
+#'   )
+#' }
 #'
 #' @family Sedona data inferface functions
 #' @export

@@ -37,6 +37,48 @@ within this list will be a JVM object of type
 Given a spatial RDD and a query object \code{x}, find all spatial objects
 within the RDD that are covered by \code{x} or intersect \code{x}.
 }
+\examples{
+library(sparklyr)
+library(sparklyr.sedona)
+
+sc <- spark_connect(master = "spark://HOST:PORT")
+
+if (!inherits(sc, "test_connection")) {
+  range_query_min_x <- -87
+  range_query_max_x <- -50
+  range_query_min_y <- 34
+  range_query_max_y <- 54
+  geom_factory <- invoke_new(
+    sc,
+    "org.locationtech.jts.geom.GeometryFactory"
+  )
+  range_query_polygon <- invoke_new(
+    sc,
+    "org.locationtech.jts.geom.Envelope",
+    range_query_min_x,
+    range_query_max_x,
+    range_query_min_y,
+    range_query_max_y
+  ) \%>\%
+    invoke(geom_factory, "toGeometry", .)
+  input_location <- system.file(
+    file.path("extdata", "polygon.json"), package = "sparklyr.sedona"
+  )
+  rdd <- sedona_read_geojson_to_typed_rdd(
+    sc,
+    location = input_location,
+    type = "polygon"
+  )
+  range_query_result_sdf <- sedona_range_query(
+    rdd,
+    x = range_query_polygon,
+    query_type = "intersect",
+    index_type = "rtree",
+    result_type = "sdf"
+  )
+}
+
+}
 \seealso{
 Other Sedona spatial query: 
 \code{\link{sedona_knn_query}()}
