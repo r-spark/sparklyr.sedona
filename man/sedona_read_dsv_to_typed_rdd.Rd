@@ -53,6 +53,27 @@ and other attributes. Currently only inputs with spatial attributes occupying
 a contiguous range of columns (i.e.,
 [first_spatial_col_index, last_spatial_col_index]) are supported.
 }
+\examples{
+library(sparklyr)
+library(sparklyr.sedona)
+
+sc <- spark_connect(master = "spark://HOST:PORT")
+
+if (!inherits(sc, "test_connection")) {
+  input_location <- system.file(
+    file.path("extdata", "arealm-tiny.csv"), package = "sparklyr.sedona"
+  )
+  rdd <- sedona_read_dsv_to_typed_rdd(
+    sc,
+    location = input_location,
+    delimiter = ",",
+    type = "point",
+    first_spatial_col_index = 1L,
+    repartition = 5
+  )
+}
+
+}
 \seealso{
 Other Sedona data inferface functions: 
 \code{\link{sedona_read_geojson_to_typed_rdd}()},

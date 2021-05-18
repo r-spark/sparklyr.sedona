@@ -35,6 +35,25 @@ LineStringRDD) from a shapefile data source.
 Create a typed SpatialRDD (namely, a PointRDD, a PolygonRDD, or a
 LineStringRDD) from a shapefile data source.
 }
+\examples{
+
+library(sparklyr)
+library(sparklyr.sedona)
+
+sc <- spark_connect(master = "spark://HOST:PORT")
+
+if (!inherits(sc, "test_connection")) {
+  input_location <- system.file(
+    file.path("extdata", "shapefile-example"), package = "sparklyr.sedona"
+  )
+  rdd <- sedona_read_shapefile_to_typed_rdd(
+    sc,
+    location = input_location,
+    type = "polygon"
+  )
+}
+
+}
 \seealso{
 Other Sedona data inferface functions: 
 \code{\link{sedona_read_dsv_to_typed_rdd}()},

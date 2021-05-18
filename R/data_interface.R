@@ -35,6 +35,26 @@ NULL
 #'   For all other types of RDDs, if last_spatial_col_index is unspecified, then
 #'   it will assume the value of -1 (i.e., the last of all input columns).
 #'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   input_location <- system.file(
+#'     file.path("extdata", "arealm-tiny.csv"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_dsv_to_typed_rdd(
+#'     sc,
+#'     location = input_location,
+#'     delimiter = ",",
+#'     type = "point",
+#'     first_spatial_col_index = 1L,
+#'     repartition = 5
+#'   )
+#' }
+#'
 #' @family Sedona data inferface functions
 #' @export
 sedona_read_dsv_to_typed_rdd <- function(
@@ -116,6 +136,24 @@ sedona_read_dsv_to_typed_rdd <- function(
 #' LineStringRDD) from a shapefile data source.
 #'
 #' @inheritParams sedona_spatial_rdd_data_source
+#'
+#' @examples
+#'
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   input_location <- system.file(
+#'     file.path("extdata", "shapefile-example"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_shapefile_to_typed_rdd(
+#'     sc,
+#'     location = input_location,
+#'     type = "polygon"
+#'   )
+#' }
 #'
 #' @export
 sedona_read_shapefile_to_typed_rdd <- function(
@@ -392,6 +430,26 @@ sedona_write_geojson <- function(x, output_location) {
 #' @param spatial_col The name of the spatial column.
 #' @param output_location Location of the output file.
 #' @param output_format Format of the output.
+#'
+#' @examples
+#'
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   tbl <- dplyr::tbl(
+#'     sc,
+#'     dplyr::sql("SELECT ST_GeomFromText('POINT(-71.064544 42.28787)') AS `pt`")
+#'   )
+#'   sedona_save_spatial_rdd(
+#'     tbl %>% dplyr::mutate(id = 1),
+#'     spatial_col = "pt",
+#'     output_location = "/tmp/pts.wkb",
+#'     output_format = "wkb"
+#'   )
+#' }
 #'
 #' @family Sedona data inferface functions
 #' @export
