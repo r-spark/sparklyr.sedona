@@ -6,8 +6,8 @@
 \arguments{
 \item{x}{A spatial RDD.}
 
-\item{non_spatial_cols}{Column names for non-spatial attributes in the
-resulting Spark Dataframe.}
+\item{name}{Name to assign to the resulting Spark temporary view. If
+unspecified, then a random name will be assigned.}
 }
 \description{
 Import data from a spatial RDD into a Spark Dataframe.
