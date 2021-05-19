@@ -17,6 +17,8 @@ Depends:
 Imports:
     rlang,
     sparklyr (>= 1.3),
+    DBI (>= 0.6-1),
+    dplyr (>= 0.7.2),
     dbplyr (>= 1.1.0)
 Encoding: UTF-8
 RoxygenNote: 7.1.1

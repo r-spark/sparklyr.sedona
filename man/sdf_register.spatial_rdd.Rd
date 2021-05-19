@@ -8,6 +8,9 @@
 }
 \arguments{
 \item{x}{A spatial RDD.}
+
+\item{name}{Name to assign to the resulting Spark temporary view. If
+unspecified, then a random name will be assigned.}
 }
 \description{
 Import data from a spatial RDD into a Spark Dataframe.

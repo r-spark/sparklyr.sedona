@@ -1,8 +1,8 @@
 #' Import data from a spatial RDD into a Spark Dataframe.
 #'
 #' @param x A spatial RDD.
-#' @param non_spatial_cols Column names for non-spatial attributes in the
-#'   resulting Spark Dataframe.
+#' @param name Name to assign to the resulting Spark temporary view. If
+#'   unspecified, then a random name will be assigned.
 #'
 #' @name as_spark_dataframe
 NULL

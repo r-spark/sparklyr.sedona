@@ -71,9 +71,9 @@ sedona_knn_query <- function(
                              index_type = c("quadtree", "rtree"),
                              result_type = c("rdd", "sdf", "raw")) {
   as.spatial_rdd <- function(sc, query_result) {
-    raw_spatial_rdd <-
-      invoke_static(sc, "java.util.Arrays", "asList", query_result) %>%
-      invoke(java_context(sc), "parallelize", .)
+    query_result <-
+      invoke_static(sc, "java.util.Arrays", "asList", query_result)
+    raw_spatial_rdd <- invoke(java_context(sc), "parallelize", query_result)
     spatial_rdd <- invoke_new(
       sc,
       "org.apache.sedona.core.spatialRDD.SpatialRDD"
@@ -100,7 +100,7 @@ sedona_knn_query <- function(
   sc <- spark_connection(rdd$.jobj)
 
   ensure_spatial_indexing(rdd, index_type)
-  invoke_static(
+  query_result <- invoke_static(
     sc,
     "org.apache.sedona.core.spatialOperator.KNNQuery",
     "SpatialKnnQuery",
@@ -108,8 +108,8 @@ sedona_knn_query <- function(
     x,
     as.integer(k),
     has_raw_partition_index(rdd)
-  ) %>%
-    post_process_query_result(sc, ., result_type)
+  )
+  post_process_query_result(sc, query_result, result_type)
 }
 
 #' Execute a range query.
@@ -197,7 +197,7 @@ sedona_range_query <- function(
   sc <- spark_connection(rdd$.jobj)
 
   ensure_spatial_indexing(rdd, index_type)
-  invoke_static(
+  query_result <- invoke_static(
     sc,
     "org.apache.sedona.core.spatialOperator.RangeQuery",
     "SpatialRangeQuery",
@@ -205,8 +205,8 @@ sedona_range_query <- function(
     x,
     identical(query_type, "intersect"),
     has_raw_partition_index(rdd)
-  ) %>%
-    post_process_query_result(sc, ., result_type)
+  )
+  post_process_query_result(sc, query_result, result_type)
 }
 
 ensure_spatial_indexing <- function(rdd, index_type = c("quadtree", "rtree")) {

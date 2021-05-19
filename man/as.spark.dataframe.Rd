@@ -11,6 +11,9 @@ as.spark.dataframe(x, non_spatial_cols = NULL, name = NULL)
 
 \item{non_spatial_cols}{Column names for non-spatial attributes in the
 resulting Spark Dataframe.}
+
+\item{name}{Name to assign to the resulting Spark temporary view. If
+unspecified, then a random name will be assigned.}
 }
 \description{
 Import data from a spatial RDD (possibly with non-spatial attributes) into a

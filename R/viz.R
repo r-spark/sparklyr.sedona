@@ -100,7 +100,7 @@ sedona_render_heatmap <- function(
     overlay = overlay
   )
   if (browse) {
-    browseURL(paste0(output_location, ".", tolower(output_format)))
+    utils::browseURL(paste0(output_location, ".", tolower(output_format)))
   }
 
   invisible(viz_op %>% new_viz_op("heatmap"))
@@ -301,7 +301,7 @@ sedona_render_viz_effect <- function(
       overlay = overlay
     )
   if (browse) {
-    browseURL(paste0(output_location, ".", tolower(output_format)))
+    utils::browseURL(paste0(output_location, ".", tolower(output_format)))
   }
 
   invisible(viz_op)
