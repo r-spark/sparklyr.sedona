@@ -1,4 +1,36 @@
+#' Import data from a spatial RDD into a Spark Dataframe.
+#'
+#' @param x A spatial RDD.
+#' @param non_spatial_cols Column names for non-spatial attributes in the
+#'   resulting Spark Dataframe.
+#'
+#' @name as_spark_dataframe
+NULL
+
+#' Import data from a spatial RDD into a Spark Dataframe.
+#'
+#' @inheritParams as_spark_dataframe
+#'
 #' @importFrom sparklyr sdf_register
+#'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   input_location <- system.file(
+#'     file.path("extdata", "polygon.json"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_geojson_to_typed_rdd(
+#'     sc,
+#'     location = input_location,
+#'     type = "polygon"
+#'   )
+#'   sdf <- sdf_register(rdd)
+#' }
+#'
 #' @export
 sdf_register.spatial_rdd <- function(x, name = NULL) {
   as.spark.dataframe(x, name = name)
@@ -9,11 +41,30 @@ sdf_register.spatial_rdd <- function(x, name = NULL) {
 #' Import data from a spatial RDD (possibly with non-spatial attributes) into a
 #' Spark Dataframe.
 #'
-#' @param x A spatial RDD.
+#' @inheritParams as_spark_dataframe
 #' @param non_spatial_cols Column names for non-spatial attributes in the
 #'   resulting Spark Dataframe.
-#' @param name Name to assign to the resulting Spark temporary view. If
-#'   unspecified, then a random name will be assigned.
+#'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   input_location <- system.file(
+#'     file.path("extdata", "arealm-tiny.csv"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_dsv_to_typed_rdd(
+#'     sc,
+#'     location = input_location,
+#'     delimiter = ",",
+#'     type = "point",
+#'     first_spatial_col_index = 1L,
+#'     repartition = 5
+#'   )
+#'   sdf <- as.spark.dataframe(rdd, non_spatial_cols = c("attr1", "attr2"))
+#' }
 #'
 #' @export
 as.spark.dataframe <- function(x, non_spatial_cols = NULL, name = NULL) {

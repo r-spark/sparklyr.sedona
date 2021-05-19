@@ -25,12 +25,31 @@ representing a Spark SQL query.}
 Export serialized data from a Spark dataframe containing exactly 1 spatial
 column into a file.
 }
+\examples{
+library(sparklyr)
+library(sparklyr.sedona)
+
+sc <- spark_connect(master = "spark://HOST:PORT")
+
+if (!inherits(sc, "test_connection")) {
+  tbl <- dplyr::tbl(
+    sc,
+    dplyr::sql("SELECT ST_GeomFromText('POINT(-71.064544 42.28787)') AS `pt`")
+  )
+  sedona_save_spatial_rdd(
+    tbl \%>\% dplyr::mutate(id = 1),
+    spatial_col = "pt",
+    output_location = "/tmp/pts.wkb",
+    output_format = "wkb"
+  )
+}
+
+}
 \seealso{
 Other Sedona data inferface functions: 
 \code{\link{sedona_read_dsv_to_typed_rdd}()},
 \code{\link{sedona_read_geojson_to_typed_rdd}()},
 \code{\link{sedona_read_geojson}()},
-\code{\link{sedona_read_shapefile_to_typed_rdd}()},
 \code{\link{sedona_read_shapefile}()},
 \code{\link{sedona_read_wkb}()},
 \code{\link{sedona_read_wkt}()},

@@ -18,6 +18,26 @@
 #'   well-defined way to override this existing setting in the partitioning
 #'   data structure.
 #'
+#' @examples
+#' library(sparklyr)
+#' library(sparklyr.sedona)
+#'
+#' sc <- spark_connect(master = "spark://HOST:PORT")
+#'
+#' if (!inherits(sc, "test_connection")) {
+#'   input_location <- system.file(
+#'     file.path("extdata", "arealm-tiny.csv"), package = "sparklyr.sedona"
+#'   )
+#'   rdd <- sedona_read_dsv_to_typed_rdd(
+#'     sc,
+#'     location = input_location,
+#'     delimiter = ",",
+#'     type = "point",
+#'     first_spatial_col_index = 1L
+#'   )
+#'   sedona_apply_spatial_partitioner(rdd, partitioner = "kdbtree")
+#' }
+#'
 #' @export
 sedona_apply_spatial_partitioner <- function(
                                              rdd,

@@ -14,12 +14,30 @@ sedona_write_wkb(x, output_location)
 \description{
 Export serialized data from a Sedona SpatialRDD into a WKB file.
 }
+\examples{
+library(sparklyr)
+library(sparklyr.sedona)
+
+sc <- spark_connect(master = "spark://HOST:PORT")
+
+if (!inherits(sc, "test_connection")) {
+  input_location <- system.file(
+    file.path("extdata", "county_tiny_wkb.tsv"), package = "sparklyr.sedona"
+  )
+  rdd <- sedona_read_wkb(
+    sc,
+    location = input_location,
+    wkb_col_idx = 0L
+  )
+  sedona_write_wkb(rdd, "/tmp/wkb_output.tsv")
+}
+
+}
 \seealso{
 Other Sedona data inferface functions: 
 \code{\link{sedona_read_dsv_to_typed_rdd}()},
 \code{\link{sedona_read_geojson_to_typed_rdd}()},
 \code{\link{sedona_read_geojson}()},
-\code{\link{sedona_read_shapefile_to_typed_rdd}()},
 \code{\link{sedona_read_shapefile}()},
 \code{\link{sedona_read_wkb}()},
 \code{\link{sedona_read_wkt}()},

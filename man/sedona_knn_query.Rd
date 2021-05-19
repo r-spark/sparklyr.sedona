@@ -38,6 +38,38 @@ nearest spatial objects within the RDD from \code{x} (distance between
 \code{x} and another geometrical object will be measured by the minimum
 possible length of any line segment connecting those 2 objects).
 }
+\examples{
+library(sparklyr)
+library(sparklyr.sedona)
+
+sc <- spark_connect(master = "spark://HOST:PORT")
+
+if (!inherits(sc, "test_connection")) {
+  knn_query_pt_x <- -84.01
+  knn_query_pt_y <- 34.01
+  knn_query_pt_tbl <- DBI::dbGetQuery(
+    sc,
+    sprintf(
+      "SELECT ST_GeomFromText(\"POINT(\%f \%f)\") AS `pt`",
+      knn_query_pt_x,
+      knn_query_pt_y
+    )
+  )
+  knn_query_pt <- knn_query_pt_tbl$pt[[1]]
+  input_location <- system.file(
+    file.path("extdata", "polygon.json"), package = "sparklyr.sedona"
+  )
+  rdd <- sedona_read_geojson_to_typed_rdd(
+    sc,
+    location = input_location,
+    type = "polygon"
+  )
+  knn_result_sdf <- sedona_knn_query(
+    rdd, x = knn_query_pt, k = 3, index_type = "rtree", result_type = "sdf"
+  )
+}
+
+}
 \seealso{
 Other Sedona spatial query: 
 \code{\link{sedona_range_query}()}

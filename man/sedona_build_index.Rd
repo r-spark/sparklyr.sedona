@@ -27,3 +27,22 @@ using with a spatial partitioner yet.}
 Given a Sedona spatial RDD, build the type of index specified on each of its
 partition(s).
 }
+\examples{
+library(sparklyr)
+library(sparklyr.sedona)
+
+sc <- spark_connect(master = "spark://HOST:PORT")
+
+if (!inherits(sc, "test_connection")) {
+  input_location <- system.file(
+    file.path("extdata", "shapefile-example"), package = "sparklyr.sedona"
+  )
+  rdd <- sedona_read_shapefile_to_typed_rdd(
+    sc,
+    location = input_location,
+    type = "polygon"
+  )
+  sedona_build_index(rdd, type = "rtree")
+}
+
+}

@@ -22,3 +22,22 @@ Required" error.}
 Transform data within a spatial RDD from one coordinate reference system to
 another.
 }
+\examples{
+library(sparklyr)
+library(sparklyr.sedona)
+
+sc <- spark_connect(master = "spark://HOST:PORT")
+
+if (!inherits(sc, "test_connection")) {
+  input_location <- system.file(
+    file.path("extdata", "polygon.json"), package = "sparklyr.sedona"
+  )
+  rdd <- sedona_read_geojson_to_typed_rdd(
+    sc, location = input_location, type = "polygon"
+  )
+  crs_transform(
+    rdd, src_epsg_crs_code = "epsg:4326", dst_epsg_crs_code = "epsg:3857"
+  )
+}
+
+}

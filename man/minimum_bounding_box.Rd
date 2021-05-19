@@ -13,6 +13,23 @@ minimum_bounding_box(x)
 Given a Sedona spatial RDD, find the axis-aligned minimal bounding box of the
 geometry represented by the RDD.
 }
+\examples{
+library(sparklyr)
+library(sparklyr.sedona)
+
+sc <- spark_connect(master = "spark://HOST:PORT")
+
+if (!inherits(sc, "test_connection")) {
+  input_location <- system.file(
+    file.path("extdata", "shapefile-example"), package = "sparklyr.sedona"
+  )
+  rdd <- sedona_read_shapefile_to_typed_rdd(
+    sc, location = input_location, type = "polygon"
+  )
+  boundary <- minimum_bounding_box(rdd)
+}
+
+}
 \seealso{
 Other Spatial RDD aggregation routine: 
 \code{\link{approx_count}()}

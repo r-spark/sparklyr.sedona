@@ -7,7 +7,7 @@
 sedona_read_wkb(
   sc,
   location,
-  wkb_col = 0L,
+  wkb_col_idx = 0L,
   allow_invalid_geometries = TRUE,
   skip_syntactically_invalid_geometries = TRUE,
   storage_level = "MEMORY_ONLY",
@@ -19,7 +19,7 @@ sedona_read_wkb(
 
 \item{location}{Location of the data source.}
 
-\item{wkb_col}{Zero-based index of column containing hex-encoded WKB data
+\item{wkb_col_idx}{Zero-based index of column containing hex-encoded WKB data
 (default: 0).}
 
 \item{allow_invalid_geometries}{Whether to allow topology-invalid
@@ -38,12 +38,27 @@ RDD (default: 1).}
 Create a generic SpatialRDD from a hex-encoded Well-Known Binary (WKB) data
 source.
 }
+\examples{
+library(sparklyr)
+library(sparklyr.sedona)
+
+sc <- spark_connect(master = "spark://HOST:PORT")
+
+if (!inherits(sc, "test_connection")) {
+  input_location <- system.file(
+    file.path("extdata", "county_tiny_wkb.tsv"), package = "sparklyr.sedona"
+  )
+  rdd <- sedona_read_wkb(
+    sc, location = input_location, wkb_col_idx = 0L
+  )
+}
+
+}
 \seealso{
 Other Sedona data inferface functions: 
 \code{\link{sedona_read_dsv_to_typed_rdd}()},
 \code{\link{sedona_read_geojson_to_typed_rdd}()},
 \code{\link{sedona_read_geojson}()},
-\code{\link{sedona_read_shapefile_to_typed_rdd}()},
 \code{\link{sedona_read_shapefile}()},
 \code{\link{sedona_read_wkt}()},
 \code{\link{sedona_save_spatial_rdd}()},
