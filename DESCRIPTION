@@ -20,6 +20,9 @@ Imports:
     DBI (>= 0.6-1),
     dplyr (>= 0.7.2),
     dbplyr (>= 1.1.0)
+Suggests:
+    knitr
 Encoding: UTF-8
 RoxygenNote: 7.1.1
 SystemRequirements: Spark: 2.4.x or 3.x
+VignetteBuilder: knitr
