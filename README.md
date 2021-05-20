@@ -1,14 +1,13 @@
-# sparklyr.sedona
+sparklyr.sedona
+================
+[![Github workflow status](https://github.com/r-spark/sparklyr.sedona/actions/workflows/ci.yaml/badge.svg)](https://github.com/r-spark/sparklyr.sedona/actions/workflows/ci.yaml)
 
 ## Overview
 
-Sparklyr.sedona is a [sparklyr](https://github.com/sparklyr/sparklyr) extension that aims to be an up-to-date R interface for [Apache Sedona](https://sedona.apache.org).
-Apache Sedona provides a versatile set of Spatial [Resilient Distributed Datasets](https://spark.apache.org/docs/latest/rdd-programming-guide.html) (RDD) functionalities
-and various Spark [UDT](https://spark.apache.org/docs/latest/api/java/org/apache/spark/sql/types/SQLUserDefinedType.html)s and
-[UDF](https://spark.apache.org/docs/latest/sql-ref-functions-udf-scalar.html)s, enabling large-scale geospatial data to be processed and visualized in scalable and
-efficient ways using Apache Spark.
-Sparklyr.sedona, built on top of sparklyr, presents what Apache Sedona has to offer through idiomatic frameworks and constructs in R
-(e.g., one can build spatial Spark SQL queries using Sedona UDFs in conjunction with a wide range of dplyr expressions), hence making Apache Sedona highly R-user friendly.
+Sparklyr.sedona is a [sparklyr](https://github.com/sparklyr/sparklyr)-based R interface for [Apache Sedona](https://sedona.apache.org).
+It presents what Apache Sedona has to offer through idiomatic frameworks and constructs in R
+(e.g., one can build spatial Spark SQL queries using Sedona UDFs in conjunction with a wide range of `dplyr` expressions),
+hence making Apache Sedona highly friendly for R users.
 
 ## Connecting to Spark
 
@@ -201,7 +200,8 @@ the output of a ML model happens to be a geospatial object as well, one can even
 
 ## Visualization
 
-It is worth mentioning `sparklyr.sedona` also implements R interfaces to Sedona visualization routines. For example, the following
+It is worth mentioning an important part of `sparklyr.sedona` is its collection of R interfaces to Sedona visualization routines.
+For example, the following
 is essentially the R equivalent of [this example in Scala](https://github.com/apache/incubator-sedona/blob/f6b1c5e24bdb67d2c8d701a9b2af1fb5658fdc4d/viz/src/main/scala/org/apache/sedona/viz/showcase/ScalaExample.scala#L142-L160).
 
 ``` r
@@ -254,7 +254,7 @@ sedona_render_choropleth_map(
 )
 ```
 
-It wlll create a scatter plot, and then overlay it on top of a choropleth map, as shown below:
+It will create a scatter plot, and then overlay it on top of a choropleth map, as shown below:
 
 <img src="docs/choropleth-map.png" width=800 />
 
